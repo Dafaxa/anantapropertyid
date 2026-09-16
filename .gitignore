@@ -1,0 +1,10 @@
+# Vercel CLI link (machine-specific)
+.vercel/
+
+# Claude Code preview config (points at a temp path on this machine)
+.claude/
+
+# OS noise
+Thumbs.db
+desktop.ini
+.DS_Store
