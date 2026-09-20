@@ -255,7 +255,7 @@
       if (!endpoint || !apiKey) {
         openMailApp();
         note.className = 'form-note is-sent';
-        note.textContent = 'Thank you — your email app has opened with your request. We reply within 1 working day.';
+        note.textContent = 'Thank you — your email app has opened with your request. We will get back to you soon.';
         return;
       }
 
@@ -290,7 +290,7 @@
         if (!res.ok) throw new Error('HTTP ' + res.status);
 
         note.className = 'form-note is-sent';
-        note.textContent = 'Thank you — your request has reached our team. We reply within 1 working day.' +
+        note.textContent = 'Thank you — your request has reached our team. We will get back to you soon.' +
           (fileInput.files.length ? ' Please email your files to hello@anantaproperty.com.' : '');
         form.reset();
         dropLabel.textContent = 'Drop files here or click to upload';
