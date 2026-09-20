@@ -542,3 +542,35 @@ body.is-locked { overflow: hidden; }
   .cue-dot { animation: none; }
   .viewer-slide, .try-slide { transition: none; }
 }
+
+/* ── Page transitions ──────────────────────────────────────────────────
+   Chromium and Safari animate between pages natively (cross-document view
+   transitions). Everyone gets a plain cross-fade — opacity only, no
+   movement, so it is fine under prefers-reduced-motion too — and the header
+   stays put. With motion allowed the new page also rises in over a dimming
+   old one. Other browsers get the small fade driven by transitions.js. */
+@view-transition { navigation: auto; }
+
+.site-header { view-transition-name: site-header; }
+
+@media (prefers-reduced-motion: no-preference) {
+  /* The old page stays fully opaque underneath and only dims, so nothing
+     behind the transition can show through as a white flash. */
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    mix-blend-mode: normal;
+    animation-duration: .6s;
+    animation-timing-function: cubic-bezier(.22, .72, .2, 1);
+    animation-fill-mode: both;
+  }
+  ::view-transition-old(root) { animation-name: vt-recede; }
+  ::view-transition-new(root) { animation-name: vt-rise; }
+
+  @keyframes vt-recede { to { filter: brightness(.72); } }
+  @keyframes vt-rise { from { opacity: 0; transform: translateY(22px); } }
+}
+
+/* No native support: fade in on load, and out before following a link. */
+html.no-vt .page { animation: page-in .5s cubic-bezier(.22, .72, .2, 1) backwards; }
+html.no-vt.is-leaving .page { opacity: 0; transition: opacity .26s ease; }
+@keyframes page-in { from { opacity: 0; } }
