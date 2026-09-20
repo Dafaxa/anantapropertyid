@@ -415,7 +415,7 @@ body.is-locked { overflow: hidden; }
 .pkg-price { margin-top: auto; display: flex; flex-direction: column; gap: 7px; border-top: 1px solid rgba(11, 21, 24, .18); padding-top: 14px; }
 .pkg-price span:first-child { font: 300 8.5px/1 var(--sans); letter-spacing: .22em; color: var(--slate); }
 .pkg-price span:last-child { font: 400 clamp(15px, 1.5vw, 19px)/1.25 var(--serif); color: var(--ink); }
-.pkg-motto { font: 300 8.5px/1.7 var(--sans); letter-spacing: .16em; color: var(--slate); }
+.pkg-motto { margin-top: auto; border-top: 1px solid rgba(11, 21, 24, .18); padding-top: 14px; font: 300 8.5px/1.7 var(--sans); letter-spacing: .16em; color: var(--slate); }
 .pkg .btn { padding: 15px 18px; font-size: 9.5px; }
 .pillars {
   display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: clamp(14px, 2vw, 26px); align-items: center;
