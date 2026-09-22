@@ -107,7 +107,23 @@
   }
 
   function renderEnquiryLinks(p) {
-    qa('.enquiry-card a[href^="contact.html"]').forEach((a) => a.setAttribute('href', 'contact.html?project=' + encQ(p.name)));
+    const confirmLink = q('.enquiry-card [data-confirm-slot]');
+    if (confirmLink) confirmLink.setAttribute('href', 'contact.html?project=' + encQ(p.name));
+
+    const brochureLink = q('.enquiry-card [data-brochure-link]');
+    if (brochureLink) {
+      if (p.brochure_url) {
+        brochureLink.textContent = 'DOWNLOAD BROCHURE';
+        brochureLink.setAttribute('href', p.brochure_url);
+        brochureLink.setAttribute('target', '_blank');
+        brochureLink.setAttribute('rel', 'noopener');
+      } else {
+        brochureLink.textContent = 'REQUEST BROCHURE';
+        brochureLink.setAttribute('href', 'contact.html?project=' + encQ(p.name));
+        brochureLink.removeAttribute('target');
+        brochureLink.removeAttribute('rel');
+      }
+    }
   }
 
   function renderTour(p) {

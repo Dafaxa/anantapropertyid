@@ -34,6 +34,7 @@
   let currentId = null; // null = unsaved new project
   let arrState = {}; // fieldName -> array of row objects, mutated in place by the UI
   let heroImages = { hero_image: '', card_image: '' };
+  let brochureUrl = '';
 
   // ---------------------------------------------------------------- auth --
   async function apiFetch(path, opts = {}) {
@@ -99,6 +100,64 @@
       value = v || '';
       urlInput.value = value;
       preview.innerHTML = value ? '<img src="' + escAttr(value) + '" alt="">' : 'No image';
+      onChange(value);
+    }
+
+    urlInput.addEventListener('change', () => setValue(urlInput.value.trim()));
+    $('[data-pick]', wrap).addEventListener('click', () => fileInput.click());
+    $('[data-clear]', wrap).addEventListener('click', () => setValue(''));
+    fileInput.addEventListener('change', async () => {
+      const file = fileInput.files[0];
+      if (!file) return;
+      status.textContent = 'Uploading…';
+      try {
+        const form = new FormData();
+        form.append('file', file);
+        form.append('folder', ($('#f-slug').value.trim() || 'misc'));
+        const res = await fetch(API + '/upload', { method: 'POST', headers: { 'x-admin-token': token }, body: form });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Upload failed');
+        setValue(data.url);
+        status.textContent = 'Uploaded.';
+        setTimeout(() => { status.textContent = ''; }, 2000);
+      } catch (err) {
+        status.textContent = 'Error: ' + err.message;
+      }
+      fileInput.value = '';
+    });
+
+    return wrap;
+  }
+
+  // Non-image file (e.g. a brochure PDF): same upload endpoint, no preview.
+  function fileField(container, key, value, onChange, labelText, accept) {
+    const wrap = document.createElement('div');
+    wrap.className = 'file-field';
+    const inputId = 'file-' + key + '-' + Math.random().toString(36).slice(2, 8);
+    wrap.innerHTML =
+      '<span>' + (labelText || key.replace(/_/g, ' ')) + '</span>' +
+      '<div class="file-status" data-status-line>' +
+      (value ? '<a href="' + escAttr(value) + '" target="_blank" rel="noopener" data-current-link>Current file &#8599;</a>' : '<span data-current-link>No file uploaded</span>') +
+      '</div>' +
+      '<div class="img-controls">' +
+      '<input type="text" data-url value="' + escAttr(value || '') + '" placeholder="File URL, or upload below">' +
+      '<button type="button" class="btn-line" data-pick>UPLOAD</button>' +
+      '<button type="button" class="btn-line" data-clear>CLEAR</button>' +
+      '<input type="file"' + (accept ? ' accept="' + accept + '"' : '') + ' class="img-upload-input" data-file id="' + inputId + '">' +
+      '</div><p class="hint" data-status style="margin:0"></p>';
+    container.appendChild(wrap);
+
+    const linkWrap = $('[data-status-line]', wrap);
+    const urlInput = $('[data-url]', wrap);
+    const status = $('[data-status]', wrap);
+    const fileInput = $('[data-file]', wrap);
+
+    function setValue(v) {
+      value = v || '';
+      urlInput.value = value;
+      linkWrap.innerHTML = value
+        ? '<a href="' + escAttr(value) + '" target="_blank" rel="noopener">Current file &#8599;</a>'
+        : '<span>No file uploaded</span>';
       onChange(value);
     }
 
@@ -244,7 +303,7 @@
     TEXT_FIELDS.forEach((k) => { p[k] = ''; });
     Object.keys(ARRAY_FIELDS).forEach((k) => { p[k] = []; });
     STRING_ARRAY_FIELDS.forEach((k) => { p[k] = []; });
-    p.hero_image = ''; p.card_image = '';
+    p.hero_image = ''; p.card_image = ''; p.brochure_url = '';
     return p;
   }
 
@@ -282,6 +341,11 @@
     imageField(heroHost, 'hero_image', heroImages.hero_image, (v) => { heroImages.hero_image = v; }, 'Hero image');
     imageField(heroHost, 'card_image', heroImages.card_image, (v) => { heroImages.card_image = v; }, 'Card image');
 
+    brochureUrl = p.brochure_url || '';
+    const brochureHost = $('#file-brochure_url');
+    brochureHost.innerHTML = '';
+    fileField(brochureHost, 'brochure_url', brochureUrl, (v) => { brochureUrl = v; }, 'Brochure PDF', 'application/pdf');
+
     renderList();
   }
 
@@ -296,6 +360,7 @@
     out.featured_home = $('#f-featured_home').checked;
     out.hero_image = heroImages.hero_image;
     out.card_image = heroImages.card_image;
+    out.brochure_url = brochureUrl;
 
     out.copy = {
       units_heading: $('#f-copy_units_heading').value.trim(),
