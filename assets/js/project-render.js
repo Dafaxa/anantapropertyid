@@ -128,6 +128,25 @@
     ).join('');
   }
 
+  function renderJsonLd(p) {
+    const data = {
+      '@context': 'https://schema.org',
+      '@type': 'Residence',
+      name: p.name,
+      description: p.intro_body || p.tagline || '',
+      url: location.href.split('?')[0] + (p.slug ? '?slug=' + encodeURIComponent(p.slug) : ''),
+      image: p.hero_image ? [p.hero_image] : undefined,
+      address: p.location_city || p.location_region || undefined,
+    };
+    let tag = q('script[type="application/ld+json"]');
+    if (!tag) {
+      tag = document.createElement('script');
+      tag.type = 'application/ld+json';
+      document.head.appendChild(tag);
+    }
+    tag.textContent = JSON.stringify(data);
+  }
+
   function notFound() {
     const main = q('main');
     main.innerHTML =
@@ -171,6 +190,7 @@
     renderGallery(p);
     renderEnquiryLinks(p);
     renderTour(p);
+    renderJsonLd(p);
 
     q('main').classList.remove('is-loading');
     window.AnantaPano && window.AnantaPano.init();

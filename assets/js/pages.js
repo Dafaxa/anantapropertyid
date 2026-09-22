@@ -271,6 +271,16 @@
         return;
       }
 
+      // Honeypot: real visitors never see or fill this field. Bots that
+      // auto-fill every input do — quietly pretend to succeed instead of
+      // telling them why, and skip the network request entirely.
+      if (val('c-hp')) {
+        note.className = 'form-note is-sent';
+        note.textContent = 'Thank you — your request has reached our team. We will get back to you soon.';
+        form.reset();
+        return;
+      }
+
       if (!endpoint || !apiKey) {
         openMailApp();
         note.className = 'form-note is-sent';
