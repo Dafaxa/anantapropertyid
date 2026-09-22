@@ -525,6 +525,45 @@ body { background: var(--ink); }
 .side-card-logo span:first-child { font: 400 15px/1 var(--sans); letter-spacing: .3em; color: var(--ivory); }
 .side-card-logo span:last-child { font: 300 7.5px/1 var(--sans); letter-spacing: .4em; color: rgba(243, 240, 233, .8); }
 
+/* Package detail pages — module grid, process grid, quote band, tag cloud, related-package cards */
+.module-grid {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1px;
+  background: rgba(11, 21, 24, .14); border: 1px solid rgba(11, 21, 24, .14);
+}
+.module-card { display: flex; flex-direction: column; gap: 14px; background: var(--ivory); padding: clamp(26px, 2.8vw, 40px); }
+.module-num { font: 400 11px/1 var(--sans); letter-spacing: .22em; color: var(--gold); }
+.module-card h3 { font: 500 clamp(18px, 1.8vw, 22px)/1.25 var(--serif); letter-spacing: -.005em; }
+.module-card > p { font: 300 13px/1.7 var(--sans); color: var(--slate); }
+.module-card .pkg-list { margin-top: 2px; }
+
+.process-grid {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 1px;
+  background: rgba(11, 21, 24, .14); border: 1px solid rgba(11, 21, 24, .14);
+}
+.process-step { display: flex; flex-direction: column; gap: 10px; background: var(--ivory); padding: clamp(22px, 2.6vw, 32px); }
+.process-num { font: 400 24px/1 var(--serif); color: var(--gold); }
+.process-step p { font: 300 12.5px/1.6 var(--sans); color: var(--body); }
+
+.quote-band { display: flex; justify-content: center; background: var(--ink); padding: clamp(56px, 8vw, 120px) var(--pad-x); }
+.quote-band blockquote { margin: 0; max-width: 56ch; text-align: center; }
+.quote-band p { font: italic 400 clamp(22px, 3vw, 34px)/1.45 var(--serif); color: var(--ivory); }
+
+.tag-cloud { display: flex; flex-wrap: wrap; gap: 10px; }
+.tag-cloud span { padding: 11px 16px; border: 1px solid rgba(11, 21, 24, .24); font: 300 10px/1 var(--sans); letter-spacing: .16em; color: var(--body); }
+
+.pkg-related {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1px;
+  background: rgba(11, 21, 24, .14); border: 1px solid rgba(11, 21, 24, .14);
+}
+.pkg-related a { display: flex; flex-direction: column; gap: 7px; background: var(--ivory); padding: clamp(20px, 2.2vw, 28px); }
+.pkg-related a span:first-child { font: 300 9px/1 var(--sans); letter-spacing: .2em; color: var(--slate); }
+.pkg-related a span:last-child { font: 400 16px/1.3 var(--serif); color: var(--ink); transition: color .2s ease; }
+.pkg-related a:hover span:last-child { color: var(--gold); }
+
+.poster-figure { display: flex; flex-direction: column; gap: 14px; align-items: center; max-width: 380px; margin: 0 auto; }
+.poster-figure img { width: 100%; height: auto; border: 1px solid rgba(11, 21, 24, .18); }
+.poster-figure figcaption { font: 300 10.5px/1.6 var(--sans); letter-spacing: .06em; color: var(--slate); text-align: center; }
+
 /* Responsive (mirrors the design's 820px / 520px breakpoints) */
 @media (max-width: 820px) {
   .stack-2 { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
@@ -533,4 +572,5 @@ body { background: var(--ink); }
 }
 @media (max-width: 520px) {
   .stack-2 { grid-template-columns: 1fr !important; }
+  .module-grid, .process-grid, .pkg-related { grid-template-columns: 1fr; }
 }
