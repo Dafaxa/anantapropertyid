@@ -44,11 +44,18 @@
     cycle();
   }
 
-  // ── Walkthrough preview (full-screen dialog) ─────────────────────────
-  const dialog = document.getElementById('walkthrough');
-  if (dialog) {
-    const rooms = $$('[data-room]', dialog);
+  // ── Walkthrough preview (full-screen dialog) ───────────────────────────
+  // The dialog's room tabs and pano config are filled in by home-render.js
+  // from the featured project's data, which arrives after an async fetch —
+  // so unlike the gallery above, this doesn't run itself. home-render.js
+  // calls window.AnantaWalkthrough.init() once the dialog's content is
+  // actually in the DOM. Safe to call even if #walkthrough doesn't exist
+  // (e.g. on pages other than Home) or the fetch never resolves.
+  function initWalkthrough() {
+    const dialog = document.getElementById('walkthrough');
+    if (!dialog) return;
     const roomTabs = $$('[data-room-tab]', dialog);
+    if (!roomTabs.length) return;
     const nameEl = dialog.querySelector('[data-room-name]');
     const counterEl = dialog.querySelector('[data-room-counter]');
     const closeBtn = dialog.querySelector('[data-close]');
@@ -57,14 +64,12 @@
 
     const setRoom = (i) => {
       room = i;
-      rooms.forEach((r, k) => r.classList.toggle('is-active', k === room));
       roomTabs.forEach((t, k) => {
         t.classList.toggle('is-active', k === room);
         t.setAttribute('aria-pressed', String(k === room));
       });
       nameEl.textContent = roomTabs[room].dataset.label;
       counterEl.textContent = pad(room + 1) + ' / ' + pad(roomTabs.length);
-      // Home's walkthrough uses the same 360° viewer as the project pages.
       const pano = dialog.querySelector('[data-pano]');
       if (pano && pano.__pano) pano.__pano.show(room);
     };
@@ -97,12 +102,16 @@
     roomTabs.forEach((t, k) => t.addEventListener('click', () => setRoom(k)));
     setRoom(0);
   }
+  window.AnantaWalkthrough = { init: initWalkthrough };
 
   if (reduce) return;
 
   // ── Staggered reveal on entry ────────────────────────────────────────
-  const targets = $$('[data-reveal]');
-  if (targets.length && 'IntersectionObserver' in window && Element.prototype.animate) {
+  // rescan() lets a render script (home-render.js, projects-index-render.js)
+  // arm elements it just inserted — observe() is a no-op on an
+  // already-observed target, and the "armed" flag below skips elements a
+  // second call would otherwise re-animate.
+  if ('IntersectionObserver' in window && Element.prototype.animate) {
     document.documentElement.classList.add('js-motion');
     const io = new IntersectionObserver((entries) => {
       entries.forEach((entry) => {
@@ -118,11 +127,19 @@
         io.unobserve(el);
       });
     }, { rootMargin: '0px 0px -10% 0px', threshold: 0.1 });
-    targets.forEach((el) => io.observe(el));
+    const arm = (el) => {
+      if (el.dataset.revealArmed) return;
+      el.dataset.revealArmed = '1';
+      io.observe(el);
+    };
+    $$('[data-reveal]').forEach(arm);
+    window.AnantaReveal = { rescan: () => $$('[data-reveal]').forEach(arm) };
   }
 
   // ── Parallax layers, hero fade and scroll cue ────────────────────────
-  const layers = $$('[data-px]');
+  // rescan() re-queries [data-px] so layers added after this script ran
+  // (the projects-index hero rotation) get the scroll-linked transform too.
+  let layers = $$('[data-px]');
   const hero = document.querySelector('[data-hero-fade]');
   const cue = document.querySelector('[data-cue]');
   let raf = 0;
@@ -151,5 +168,6 @@
   const onScroll = () => { if (!raf) raf = requestAnimationFrame(tick); };
   window.addEventListener('scroll', onScroll, { passive: true });
   window.addEventListener('resize', onScroll);
+  window.AnantaParallax = { rescan: () => { layers = $$('[data-px]'); tick(); } };
   tick();
 })();

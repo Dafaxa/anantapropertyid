@@ -1,13 +1,25 @@
 /* Ananta Property — inner-page interactions.
    Ports the Claude Design logic for Projects, the project detail pages,
-   Insights, Article and Contact. Loaded after main.js (reveal + parallax). */
+   Insights, Article and Contact. Loaded after main.js (reveal + parallax).
+
+   Project data (cards, stats, units, tour rooms, …) now comes from Supabase
+   and is injected by project-render.js / projects-index-render.js AFTER
+   this script has already run — so every click handler below is bound via
+   delegation on `document` rather than on the target elements directly.
+   Delegation resolves its target at click time, so it doesn't matter
+   whether the button existed when this script loaded or was added a
+   moment ago by a fetch that just resolved. The one thing that can't work
+   this way is content that depends on *data* being present, not just a
+   click — the projects-index hero rotation and filters — so that block is
+   exposed as window.AnantaProjectsIndex.init() for projects-index-render.js
+   to call once it has built the cards. */
 (() => {
   const $ = (sel, root = document) => root.querySelector(sel);
   const $$ = (sel, root = document) => Array.from(root.querySelectorAll(sel));
   const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const params = new URLSearchParams(location.search);
 
-  // ── Single-select button groups ───────────────────────────────────────
+  // ── Single-select button groups (delegated) ────────────────────────────
   // <div data-choice-group="name"><button data-choice="value">…</button></div>
   const select = (group, btn) => {
     $$('[data-choice]', group).forEach((b) => {
@@ -17,8 +29,10 @@
     });
     group.dispatchEvent(new CustomEvent('choice', { detail: btn }));
   };
-  $$('[data-choice-group]').forEach((group) => {
-    $$('[data-choice]', group).forEach((btn) => btn.addEventListener('click', () => select(group, btn)));
+  document.addEventListener('click', (e) => {
+    const btn = e.target.closest('[data-choice]');
+    const group = btn && btn.closest('[data-choice-group]');
+    if (group) select(group, btn);
   });
   const onChoice = (name, fn) => {
     const group = $('[data-choice-group="' + name + '"]');
@@ -27,7 +41,7 @@
   };
   const activeChoice = (group) => group && $('[data-choice].is-active', group);
 
-  // ── Full-screen dialogs (360° tour) ───────────────────────────────────
+  // ── Full-screen dialogs (360° tour, delegated open) ────────────────────
   const openDialog = (dialog) => {
     const last = document.activeElement;
     const onKey = (e) => {
@@ -57,47 +71,51 @@
   };
   const tour = document.getElementById('tour');
   if (tour) {
-    $$('[data-open-tour]').forEach((b) => b.addEventListener('click', () => openDialog(tour)));
+    document.addEventListener('click', (e) => { if (e.target.closest('[data-open-tour]')) openDialog(tour); });
     onChoice('room', (btn) => { $('[data-room-name]', tour).textContent = btn.dataset.label; });
   }
 
-  // ── Project detail: unit type tabs + viewing slot ─────────────────────
+  // ── Project detail: unit type tabs ─────────────────────────────────────
   onChoice('unit', (btn) => {
     $$('[data-unit-name]').forEach((el) => { el.textContent = btn.dataset.name; });
     $$('[data-unit-area]').forEach((el) => { el.textContent = btn.dataset.area; });
   });
-  const confirm = $('[data-confirm-slot]');
-  if (confirm) {
-    confirm.addEventListener('click', () => {
-      const day = activeChoice($('[data-choice-group="day"]'));
-      const time = activeChoice($('[data-choice-group="time"]'));
-      const visit = [day && day.dataset.choice, time && time.dataset.choice].filter(Boolean).join(', ');
-      const url = new URL(confirm.getAttribute('href'), location.href);
-      if (visit) url.searchParams.set('visit', visit);
-      confirm.setAttribute('href', url.pathname.split('/').pop() + url.search);
-    });
-  }
+
+  // ── Project detail: private-viewing "confirm slot" (delegated) ────────
+  document.addEventListener('click', (e) => {
+    const confirmBtn = e.target.closest('[data-confirm-slot]');
+    if (!confirmBtn) return;
+    const day = activeChoice($('[data-choice-group="day"]'));
+    const time = activeChoice($('[data-choice-group="time"]'));
+    const visit = [day && day.dataset.choice, time && time.dataset.choice].filter(Boolean).join(', ');
+    const url = new URL(confirmBtn.getAttribute('href'), location.href);
+    if (visit) url.searchParams.set('visit', visit);
+    confirmBtn.setAttribute('href', url.pathname.split('/').pop() + url.search);
+  });
 
   // ── Projects index: rotating hero + filters ───────────────────────────
-  const heroLayers = $$('[data-hero-layer]');
-  const heroPicks = $$('[data-hero-pick]');
-  if (heroLayers.length) {
-    let hero = 0;
-    let timer = 0;
-    const show = (i) => {
-      hero = i;
-      heroLayers.forEach((l, k) => l.classList.toggle('is-active', k === i));
-      heroPicks.forEach((b, k) => {
-        b.classList.toggle('is-active', k === i);
-        b.setAttribute('aria-pressed', String(k === i));
-      });
-    };
-    heroPicks.forEach((b, k) => b.addEventListener('click', () => { clearInterval(timer); show(k); }));
-    if (!reduce) timer = setInterval(() => show((hero + 1) % heroLayers.length), 6000);
-  }
+  // Called by projects-index-render.js once it has built the hero layers,
+  // "now showing" picks and the project cards from fetched data.
+  function initProjectsIndex() {
+    const heroLayers = $$('[data-hero-layer]');
+    const heroPicks = $$('[data-hero-pick]');
+    if (heroLayers.length) {
+      let hero = 0;
+      let timer = 0;
+      const show = (i) => {
+        hero = i;
+        heroLayers.forEach((l, k) => l.classList.toggle('is-active', k === i));
+        heroPicks.forEach((b, k) => {
+          b.classList.toggle('is-active', k === i);
+          b.setAttribute('aria-pressed', String(k === i));
+        });
+      };
+      heroPicks.forEach((b, k) => b.addEventListener('click', () => { clearInterval(timer); show(k); }));
+      if (!reduce) timer = setInterval(() => show((hero + 1) % heroLayers.length), 6000);
+    }
 
-  const grid = $('[data-project-grid]');
-  if (grid) {
+    const grid = $('[data-project-grid]');
+    if (!grid) return;
     const cards = $$('.p-card', grid);
     const slot = $('.p-slot', grid);
     const loc = $('#f-loc');
@@ -142,6 +160,7 @@
     const pre = $$('[data-choice]', cats).find((b) => b.dataset.choice.toLowerCase() === wanted);
     if (pre) select(cats, pre); else apply();
   }
+  window.AnantaProjectsIndex = { init: initProjectsIndex };
 
   // ── Insights: category filter ─────────────────────────────────────────
   const insights = $('[data-insights]');

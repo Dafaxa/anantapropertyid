@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Loading project… — Ananta Property</title>
+<meta name="description" content="Ananta Property development.">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<!-- No <meta name="project-slug">: project-render.js reads ?slug=… from the
+     URL instead. Used for any project added in the admin panel that isn't
+     one of the three with a dedicated pretty filename. -->
+<meta name="theme-color" content="#0B1518">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400&amp;family=Montserrat:wght@200;300;400;500&amp;display=swap" rel="stylesheet">
+<script>if(!window.CSSViewTransitionRule)document.documentElement.classList.add('no-vt')</script>
+<script type="speculationrules">{"prerender":[{"where":{"href_matches":"/*"},"eagerness":"moderate"}]}</script>
+<link rel="stylesheet" href="assets/css/styles.css">
+<link rel="stylesheet" href="assets/css/pages.css">
+<script src="assets/js/transitions.js" defer></script>
+<script src="assets/js/main.js" defer></script>
+<script src="assets/js/pages.js" defer></script>
+<script src="assets/js/pano.js" defer></script>
+<script src="assets/js/project-render.js" defer></script>
+</head>
+<body>
+<div class="page" id="top" data-pdp>
+
+<header class="site-header">
+  <a class="brand" href="index.html" aria-label="Ananta Property — home">
+    <span class="brand-name">ANANTA</span>
+    <span class="brand-sub">PROPERTY™</span>
+  </a>
+  <nav class="site-nav" aria-label="Primary">
+    <a href="index.html#work">WORK</a>
+    <a class="is-active" href="projects.html">PROJECTS</a>
+    <a href="index.html#services">SERVICES</a>
+    <a href="index.html#packages">PACKAGES</a>
+    <a href="insights.html">INSIGHTS</a>
+    <a href="index.html#about">ABOUT</a>
+  </nav>
+  <span class="lang">EN&nbsp;/&nbsp;<a href="#top" lang="id" hreflang="id">ID</a></span>
+  <a class="header-cta" href="contact.html">ENQUIRE</a>
+</header>
+
+<div class="subnav sticky-md">
+  <a class="subnav-back" href="projects.html">&#8592; ALL PROJECTS</a>
+  <nav aria-label="Sections">
+    <a class="is-active" href="#overview">OVERVIEW</a>
+    <a href="#units">UNITS</a>
+    <a href="#amenities">AMENITIES</a>
+    <a href="#location">LOCATION</a>
+    <a href="#gallery">GALLERY</a>
+  </nav>
+  <button type="button" class="subnav-tour" data-open-tour aria-haspopup="dialog" aria-controls="tour">
+    <span class="box-360" aria-hidden="true">360</span>VIRTUAL TOUR
+  </button>
+</div>
+
+<main class="is-loading">
+
+<section class="pdp-hero" aria-labelledby="pdp-title">
+  <div class="fill"></div>
+  <div class="scrim"></div>
+  <div class="pdp-hero-inner">
+    <div class="pdp-hero-text">
+      <p class="pdp-kicker">&nbsp;</p>
+      <h1 class="pdp-title" id="pdp-title">Loading project…</h1>
+      <p class="pdp-tagline">&nbsp;</p>
+    </div>
+    <div class="btn-row">
+      <button type="button" class="btn btn-gold" data-open-tour aria-haspopup="dialog" aria-controls="tour">OPEN 360° TOUR</button>
+      <a class="btn btn-line-light soft" href="#gallery">GALLERY</a>
+    </div>
+  </div>
+</section>
+
+<div class="pdp-layout stack">
+  <div>
+    <section class="pdp-stats stack-2" id="overview" aria-label="Key figures"></section>
+
+    <section class="pdp-intro stack" aria-label="About the project">
+      <div>
+        <p class="eyebrow">THE PROJECT</p>
+        <h2></h2>
+      </div>
+      <p></p>
+    </section>
+
+    <section class="pdp-section units" id="units" aria-labelledby="units-title">
+      <div class="pdp-section-head">
+        <h2 id="units-title">Unit types &amp; floorplans</h2>
+        <div class="tabs" data-choice-group="unit"></div>
+      </div>
+      <div class="units-grid stack">
+        <div class="plan">
+          <div class="plan-frame"></div>
+          <div class="plan-views"></div>
+        </div>
+        <div class="unit-detail">
+          <p class="unit-name"><span data-unit-name></span> · <span data-unit-area></span></p>
+          <div class="unit-specs"></div>
+          <div class="btn-row">
+            <button type="button" class="btn btn-ink" data-open-tour aria-haspopup="dialog" aria-controls="tour">WALK THIS PROJECT IN 360°</button>
+            <a class="btn btn-line-ink" href="contact.html">DOWNLOAD PLAN PDF</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="pdp-section" id="amenities" aria-labelledby="amenities-title">
+      <div class="pdp-section-head">
+        <h2 id="amenities-title">Facilities</h2>
+      </div>
+      <div class="amenities stack-2"></div>
+    </section>
+
+    <section class="pdp-section location is-last" id="location" aria-labelledby="location-title">
+      <div class="pdp-section-head">
+        <h2 id="location-title">Location</h2>
+        <p></p>
+      </div>
+      <div class="location-grid stack">
+        <div class="map-frame"></div>
+        <div class="location-points"></div>
+      </div>
+    </section>
+  </div>
+
+  <aside class="enquiry-card sticky-md" id="enquire" aria-label="Enquire about this project">
+    <fieldset class="booking">
+      <legend class="card-label">BOOK A PRIVATE VIEWING</legend>
+      <div class="choices days" data-choice-group="day">
+        <button type="button" class="choice" data-choice="Mon 12" aria-pressed="false">MON<br>12</button>
+        <button type="button" class="choice is-active" data-choice="Tue 13" aria-pressed="true">TUE<br>13</button>
+        <button type="button" class="choice" data-choice="Wed 14" aria-pressed="false">WED<br>14</button>
+      </div>
+      <div class="choices" data-choice-group="time">
+        <button type="button" class="choice" data-choice="09:00" aria-pressed="false">09:00</button>
+        <button type="button" class="choice" data-choice="13:00" aria-pressed="false">13:00</button>
+        <button type="button" class="choice" data-choice="16:00" aria-pressed="false">16:00</button>
+      </div>
+    </fieldset>
+    <a class="btn btn-gold" href="contact.html" data-confirm-slot>CONFIRM SLOT</a>
+    <a class="btn btn-line-light" href="contact.html">DOWNLOAD BROCHURE</a>
+    <a class="btn btn-line-light" href="https://wa.me/6285162863108" target="_blank" rel="noopener">WHATSAPP 0851 6286 3108</a>
+    <p class="card-note">PRIVATE VIEWINGS BY APPOINTMENT<br>MON — SAT · 09:00 — 18:00</p>
+  </aside>
+</div>
+
+<section class="pdp-gallery" id="gallery" aria-labelledby="gallery-title">
+  <div class="pdp-section-head">
+    <h2 id="gallery-title">Gallery</h2>
+    <p></p>
+  </div>
+  <div class="gallery-grid stack-2"></div>
+</section>
+
+</main>
+
+<footer class="site-footer is-inner">
+  <p class="footer-motto">FROM VISION TO VALUE.</p>
+  <p class="footer-brand">
+    <span>ANANTA</span>
+    <span>PROPERTY™</span>
+  </p>
+</footer>
+
+<div class="tour" id="tour" role="dialog" aria-modal="true" aria-labelledby="tour-title" hidden>
+  <div class="tour-bar">
+    <button type="button" class="tour-close" data-close>✕&nbsp;&nbsp;CLOSE TOUR</button>
+    <div class="tour-modes" id="tour-title">
+      <span>360° PANORAMA</span>
+      <span>3D MODEL</span>
+      <span>FLOORPLAN</span>
+    </div>
+    <div class="tour-viewing">
+      <span>VIEWING</span>
+      <span><span data-unit-name></span> · <span data-room-name></span></span>
+    </div>
+  </div>
+
+  <div class="tour-stage">
+    <div class="pano" data-pano aria-label="360° panorama — drag to look around">
+      <script type="application/json" data-pano-config>{"rooms":[]}</script>
+    </div>
+    <div class="pano-map" data-pano-map></div>
+    <p class="tour-hint">DRAG TO LOOK AROUND</p>
+  </div>
+
+  <div class="tour-foot">
+    <div class="tour-rooms" data-choice-group="room"></div>
+    <div class="tour-links">
+      <a href="#units" data-close>MATERIALS</a>
+      <a href="#enquire" data-close>SCHEDULE A VIEWING</a>
+    </div>
+  </div>
+</div>
+
+</div>
+</body>
+</html>

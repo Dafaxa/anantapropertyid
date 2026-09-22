@@ -17,6 +17,7 @@
 <script src="assets/js/transitions.js" defer></script>
 <script src="assets/js/main.js" defer></script>
 <script src="assets/js/pages.js" defer></script>
+<script src="assets/js/projects-index-render.js" defer></script>
 </head>
 <body>
 <div class="page" id="top">
@@ -41,15 +42,7 @@
 <main>
 
 <section class="idx-hero" aria-labelledby="idx-title">
-  <div class="px-layer is-active" data-px="0.24" data-hero-layer>
-    <img src="assets/img/masterplan-aerial.jpg" width="456" height="245" alt="" fetchpriority="high" decoding="async">
-  </div>
-  <div class="px-layer" data-px="0.24" data-hero-layer>
-    <img src="assets/img/sky-suites-tower.jpg" width="362" height="250" alt="" loading="lazy" decoding="async">
-  </div>
-  <div class="px-layer" data-px="0.24" data-hero-layer>
-    <img src="assets/img/residences-villa.jpg" width="1042" height="630" alt="" loading="lazy" decoding="async">
-  </div>
+  <div class="hero-layers" style="position:absolute;inset:0"></div>
   <div class="scrim"></div>
 
   <div class="idx-hero-grid stack">
@@ -116,48 +109,6 @@
 
 <section class="idx-list" id="index" aria-label="All projects">
   <div class="idx-grid stack" data-project-grid>
-    <a class="p-card" href="grand-masterplan.html" data-category="Masterplan" data-location="Bali" data-status="Launching" data-year="2026" data-name="Ananta Grand Masterplan">
-      <div class="media">
-        <img src="assets/img/masterplan-aerial.jpg" width="456" height="245" loading="lazy" decoding="async" alt="Aerial of the Ananta Grand Masterplan — villas terraced into a river valley near Ubud">
-        <span class="p-tag cat">MASTERPLAN</span>
-        <span class="p-tag status is-launching">LAUNCHING</span>
-      </div>
-      <div class="p-body">
-        <div class="p-title"><span>Ananta Grand Masterplan</span><span>2026</span></div>
-        <p class="p-loc">UBUD, BALI</p>
-        <div class="p-facts"><span>120 lots</span><span>18 ha</span></div>
-        <div class="p-foot"><span>VIEW PROJECT</span><span aria-hidden="true">&#10230;</span></div>
-      </div>
-    </a>
-
-    <a class="p-card" href="sky-suites.html" data-category="Apartment" data-location="Jakarta" data-status="Under construction" data-year="2025" data-name="Ananta Sky Suites">
-      <div class="media">
-        <img src="assets/img/sky-suites-tower.jpg" width="362" height="250" loading="lazy" decoding="async" alt="Ananta Sky Suites — tower balconies and pool deck above the Jakarta skyline">
-        <span class="p-tag cat">APARTMENT</span>
-        <span class="p-tag status">UNDER CONSTRUCTION</span>
-      </div>
-      <div class="p-body">
-        <div class="p-title"><span>Ananta Sky Suites</span><span>2025</span></div>
-        <p class="p-loc">SCBD, JAKARTA</p>
-        <div class="p-facts"><span>284 units</span><span>86–210 m²</span></div>
-        <div class="p-foot"><span>VIEW PROJECT</span><span aria-hidden="true">&#10230;</span></div>
-      </div>
-    </a>
-
-    <a class="p-card" href="residences.html" data-category="Villa" data-location="Bali" data-status="Under construction" data-year="2025" data-name="Ananta Residences">
-      <div class="media">
-        <img src="assets/img/residences-villa.jpg" width="1042" height="630" loading="lazy" decoding="async" alt="Ananta Residences — cliff-top villa with an infinity pool above the Uluwatu coastline">
-        <span class="p-tag cat">VILLA</span>
-        <span class="p-tag status">UNDER CONSTRUCTION</span>
-      </div>
-      <div class="p-body">
-        <div class="p-title"><span>Ananta Residences</span><span>2025</span></div>
-        <p class="p-loc">ULUWATU, BALI</p>
-        <div class="p-facts"><span>18 villas</span><span>248–392 m²</span></div>
-        <div class="p-foot"><span>VIEW PROJECT</span><span aria-hidden="true">&#10230;</span></div>
-      </div>
-    </a>
-
     <a class="p-slot" href="contact.html">
       <span class="plus" aria-hidden="true">+</span>
       <span class="title">Your project here</span>

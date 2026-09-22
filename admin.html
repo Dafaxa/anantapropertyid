@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Admin — Ananta Property</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<meta name="theme-color" content="#0B1518">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400&family=Montserrat:wght@200;300;400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/styles.css">
+<link rel="stylesheet" href="assets/css/admin.css">
+</head>
+<body class="admin-body">
+
+<div id="login-screen" class="login-screen">
+  <form id="login-form" class="login-card">
+    <p class="brand-name" style="color:var(--ivory)">ANANTA</p>
+    <p class="brand-sub" style="color:var(--gold)">PROPERTY™ ADMIN</p>
+    <label class="field">
+      <span>ADMIN TOKEN</span>
+      <input type="password" id="login-token" autocomplete="off" required>
+    </label>
+    <p id="login-error" class="login-error" hidden>Invalid token. Try again.</p>
+    <button type="submit" class="btn btn-gold">SIGN IN</button>
+  </form>
+</div>
+
+<div id="app" class="admin-app" hidden>
+
+  <header class="admin-header">
+    <a class="brand" href="index.html" aria-label="Ananta Property — home">
+      <span class="brand-name">ANANTA</span>
+      <span class="brand-sub">PROPERTY™ ADMIN</span>
+    </a>
+    <div class="admin-header-actions">
+      <a class="btn-line" href="index.html" target="_blank" rel="noopener">VIEW SITE ↗</a>
+      <button type="button" class="btn-line" id="logout-btn">LOG OUT</button>
+    </div>
+  </header>
+
+  <div class="admin-shell">
+
+    <aside class="admin-list" aria-label="Projects">
+      <div class="admin-list-head">
+        <p class="eyebrow">PROJECTS</p>
+        <button type="button" class="btn btn-gold btn-sm" id="new-project-btn">+ NEW</button>
+      </div>
+      <div id="project-list" class="project-list"></div>
+    </aside>
+
+    <main class="admin-form-wrap">
+      <div id="empty-state" class="admin-empty">
+        <p>Select a project on the left, or create a new one.</p>
+      </div>
+
+      <form id="project-form" class="admin-form" hidden>
+
+        <div class="form-topbar">
+          <p class="form-title" id="form-title">New project</p>
+          <div class="form-topbar-actions">
+            <label class="check-inline"><input type="checkbox" id="f-published"> Published</label>
+            <label class="check-inline"><input type="checkbox" id="f-featured_home"> Featured on home</label>
+            <button type="button" class="btn-line btn-sm" id="duplicate-btn">DUPLICATE</button>
+            <button type="button" class="btn-line btn-sm danger" id="delete-btn">DELETE</button>
+            <button type="submit" class="btn btn-gold btn-sm">SAVE</button>
+          </div>
+        </div>
+        <p id="save-status" class="save-status" aria-live="polite"></p>
+
+        <section class="form-section">
+          <h2>Identity</h2>
+          <div class="grid-2">
+            <label class="field"><span>Slug *</span><input type="text" id="f-slug" required pattern="[a-z0-9]+(-[a-z0-9]+)*" placeholder="ananta-something"></label>
+            <label class="field"><span>Name *</span><input type="text" id="f-name" required></label>
+            <label class="field"><span>Category *</span>
+              <select id="f-category" required>
+                <option value="Villa">Villa</option>
+                <option value="Apartment">Apartment</option>
+                <option value="Masterplan">Masterplan</option>
+              </select>
+            </label>
+            <label class="field"><span>Status</span>
+              <select id="f-status">
+                <option value="Under construction">Under construction</option>
+                <option value="Launching">Launching</option>
+                <option value="Completed">Completed</option>
+              </select>
+            </label>
+            <label class="field"><span>Year</span><input type="number" id="f-year" min="2000" max="2100"></label>
+            <label class="field"><span>Sort order</span><input type="number" id="f-sort_order" value="0"></label>
+          </div>
+          <label class="field"><span>Tagline</span><input type="text" id="f-tagline"></label>
+        </section>
+
+        <section class="form-section">
+          <h2>Location</h2>
+          <div class="grid-2">
+            <label class="field"><span>Location label (hero strip)</span><input type="text" id="f-location_label" placeholder="VILLA COLLECTION · ULUWATU, BALI · COMPLETION 2027"></label>
+            <label class="field"><span>Location short (filter value)</span><input type="text" id="f-location_short" placeholder="Bali"></label>
+            <label class="field"><span>Location region</span><input type="text" id="f-location_region" placeholder="SOUTH BALI"></label>
+            <label class="field"><span>Location city (card/detail)</span><input type="text" id="f-location_city" placeholder="ULUWATU, BALI"></label>
+          </div>
+        </section>
+
+        <section class="form-section">
+          <h2>Images</h2>
+          <div class="grid-2" id="img-hero_image"></div>
+        </section>
+
+        <section class="form-section">
+          <h2>Intro</h2>
+          <div class="grid-2">
+            <label class="field"><span>Intro eyebrow</span><input type="text" id="f-intro_eyebrow" placeholder="THE PROJECT"></label>
+            <label class="field"><span>Gallery kicker</span><input type="text" id="f-gallery_kicker" placeholder="EXTERIOR · INTERIOR · AERIAL"></label>
+          </div>
+          <label class="field"><span>Intro title (use a new line for a line break)</span><textarea id="f-intro_title" rows="2"></textarea></label>
+          <label class="field"><span>Intro body</span><textarea id="f-intro_body" rows="4"></textarea></label>
+        </section>
+
+        <section class="form-section">
+          <h2>Home page copy (optional — falls back to intro/location above)</h2>
+          <label class="field"><span>Home meta line</span><input type="text" id="f-home_meta"></label>
+          <label class="field"><span>Home lede</span><textarea id="f-home_lede" rows="3"></textarea></label>
+        </section>
+
+        <section class="form-section">
+          <h2>Stats (glance numbers)</h2>
+          <div id="arr-stats" class="arr-list"></div>
+          <button type="button" class="btn-line btn-sm" data-add="stats">+ ADD STAT</button>
+        </section>
+
+        <section class="form-section">
+          <h2>Units / unit types</h2>
+          <div id="arr-units" class="arr-list"></div>
+          <button type="button" class="btn-line btn-sm" data-add="units">+ ADD UNIT TYPE</button>
+        </section>
+
+        <section class="form-section">
+          <h2>Unit specs (spec rows shown under the selected unit)</h2>
+          <div id="arr-specs" class="arr-list"></div>
+          <button type="button" class="btn-line btn-sm" data-add="specs">+ ADD SPEC ROW</button>
+        </section>
+
+        <section class="form-section">
+          <h2>Amenities</h2>
+          <div id="arr-amenities" class="arr-list"></div>
+          <button type="button" class="btn-line btn-sm" data-add="amenities">+ ADD AMENITY</button>
+        </section>
+
+        <section class="form-section">
+          <h2>Gallery</h2>
+          <div id="arr-gallery" class="arr-list"></div>
+          <button type="button" class="btn-line btn-sm" data-add="gallery">+ ADD GALLERY IMAGE</button>
+        </section>
+
+        <section class="form-section">
+          <h2>360° walkthrough rooms</h2>
+          <p class="hint">Each room needs an equirectangular panorama image (src). x/y position the hotspot on the mini-map (0–100), heading (0–359°) sets which way the camera starts facing.</p>
+          <div id="arr-pano_rooms" class="arr-list"></div>
+          <button type="button" class="btn-line btn-sm" data-add="pano_rooms">+ ADD ROOM</button>
+        </section>
+
+        <section class="form-section">
+          <h2>Location points (distances near the project)</h2>
+          <div id="arr-location_points" class="arr-list"></div>
+          <button type="button" class="btn-line btn-sm" data-add="location_points">+ ADD LOCATION POINT</button>
+        </section>
+
+        <section class="form-section">
+          <h2>Card facts (shown on the project card, max 2 used)</h2>
+          <div id="arr-card_facts" class="arr-list"></div>
+          <button type="button" class="btn-line btn-sm" data-add="card_facts">+ ADD FACT</button>
+        </section>
+
+        <section class="form-section">
+          <h2>Labels (unit tabs / tour CTA / downloads)</h2>
+          <div class="grid-2">
+            <label class="field"><span>Units section heading</span><input type="text" id="f-copy_units_heading" placeholder="Unit types & floorplans"></label>
+            <label class="field"><span>Tour CTA label</span><input type="text" id="f-copy_tour_cta_label" placeholder="WALK THIS UNIT IN 360"></label>
+            <label class="field"><span>Download button label</span><input type="text" id="f-copy_download_label" placeholder="DOWNLOAD PLAN PDF"></label>
+          </div>
+          <p class="hint">Plan-view tab labels (e.g. GROUND, UPPER, ROOF) — comma separated.</p>
+          <label class="field"><span>Plan view tabs</span><input type="text" id="f-copy_plan_views" placeholder="GROUND, UPPER, ROOF"></label>
+        </section>
+
+      </form>
+    </main>
+  </div>
+</div>
+
+<script src="assets/js/admin.js" defer></script>
+</body>
+</html>
