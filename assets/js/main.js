@@ -104,6 +104,22 @@
   }
   window.AnantaWalkthrough = { init: initWalkthrough };
 
+  // ── Mobile nav: hamburger toggle ───────────────────────────────────────
+  const navToggle = document.querySelector('.nav-toggle');
+  const siteNav = document.querySelector('.site-nav');
+  if (navToggle && siteNav) {
+    const closeNav = () => {
+      siteNav.classList.remove('is-open');
+      navToggle.setAttribute('aria-expanded', 'false');
+    };
+    navToggle.addEventListener('click', () => {
+      const open = siteNav.classList.toggle('is-open');
+      navToggle.setAttribute('aria-expanded', String(open));
+    });
+    siteNav.addEventListener('click', (e) => { if (e.target.tagName === 'A') closeNav(); });
+    window.addEventListener('resize', () => { if (window.innerWidth > 820) closeNav(); });
+  }
+
   if (reduce) return;
 
   // ── Staggered reveal on entry ────────────────────────────────────────
