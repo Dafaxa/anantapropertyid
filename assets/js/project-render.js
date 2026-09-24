@@ -169,6 +169,31 @@
     ).join('');
   }
 
+  // Canonical + social tags for the live project. Search engines that render JS
+  // (Google) read these; the three pretty pages also ship static equivalents.
+  function setHead(selector, create, attrs) {
+    let el = q(selector);
+    if (!el) { el = document.createElement(create); document.head.appendChild(el); }
+    Object.entries(attrs).forEach(([k, v]) => el.setAttribute(k, v));
+  }
+  function renderSeo(p) {
+    const isPretty = !!q('meta[name="project-slug"]');
+    const PRETTY = { residences: 'residences.html', 'sky-suites': 'sky-suites.html', 'grand-masterplan': 'grand-masterplan.html' };
+    const url = PRETTY[p.slug]
+      ? location.origin + '/' + PRETTY[p.slug]
+      : location.origin + location.pathname + (isPretty ? '' : '?slug=' + encodeURIComponent(p.slug));
+    const title = p.name + ' — Ananta Property';
+    const desc = (p.intro_body || p.tagline || p.name).slice(0, 155);
+    const image = p.hero_image ? new URL(p.hero_image, location.href).href : '';
+    setHead('link[rel="canonical"]', 'link', { rel: 'canonical', href: url });
+    const og = { 'og:type': 'website', 'og:site_name': 'Ananta Property', 'og:title': title, 'og:description': desc, 'og:url': url };
+    if (image) og['og:image'] = image;
+    Object.entries(og).forEach(([k, v]) => setHead('meta[property="' + k + '"]', 'meta', { property: k, content: v }));
+    const tw = { 'twitter:card': 'summary_large_image', 'twitter:title': title, 'twitter:description': desc };
+    if (image) tw['twitter:image'] = image;
+    Object.entries(tw).forEach(([k, v]) => setHead('meta[name="' + k + '"]', 'meta', { name: k, content: v }));
+  }
+
   function renderJsonLd(p) {
     const data = {
       '@context': 'https://schema.org',
@@ -232,6 +257,7 @@
     renderEnquiryLinks(p);
     renderTour(p);
     renderJsonLd(p);
+    renderSeo(p);
 
     document.addEventListener('click', (e) => {
       const tab = e.target.closest('.tabs[data-choice-group="unit"] .tab');
