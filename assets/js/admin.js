@@ -433,13 +433,109 @@
     loadIntoForm(blankProject());
   });
 
+  // --------------------------------------------------------------- enquiries --
+  let enquiries = [];
+
+  function fmtDate(iso) {
+    const d = new Date(iso);
+    return isNaN(d) ? '' : d.toLocaleString('en-GB', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+  }
+
+  function updateBadge() {
+    const open = enquiries.filter((e) => !e.handled).length;
+    const badge = $('#enq-badge');
+    badge.textContent = String(open);
+    badge.hidden = open === 0;
+  }
+
+  function renderEnquiries() {
+    const onlyOpen = $('#enq-only-open').checked;
+    const list = enquiries.filter((e) => !onlyOpen || !e.handled);
+    const host = $('#enq-list');
+    host.innerHTML = '';
+    if (!list.length) {
+      host.innerHTML = '<p class="hint" style="margin:0">' + (onlyOpen ? 'No unhandled enquiries.' : 'No enquiries yet.') + '</p>';
+      return;
+    }
+    list.forEach((e) => {
+      const card = document.createElement('article');
+      card.className = 'enq-card' + (e.handled ? ' is-handled' : '');
+      const wa = String(e.whatsapp || '').replace(/[^\d]/g, '');
+      const tags = [e.project_type, e.project_ref && ('Project: ' + e.project_ref), e.visit_slot && ('Viewing: ' + e.visit_slot)]
+        .concat(e.deliverables || []).filter(Boolean);
+      card.innerHTML =
+        '<div class="enq-head"><span class="enq-name">' + escHtml(e.name) + (e.company ? ' · ' + escHtml(e.company) : '') + '</span>' +
+        '<span class="enq-meta">' + escHtml(fmtDate(e.created_at)) + '</span></div>' +
+        '<div class="enq-contact"><a href="mailto:' + escAttr(e.email) + '">' + escHtml(e.email) + '</a>' +
+        (wa ? '<a href="https://wa.me/' + wa + '" target="_blank" rel="noopener">' + escHtml(e.whatsapp) + ' (WhatsApp)</a>' : '') + '</div>' +
+        (tags.length ? '<div class="enq-tags">' + tags.map((t) => '<span>' + escHtml(t) + '</span>').join('') + '</div>' : '') +
+        (e.brief ? '<p class="enq-brief">' + escHtml(e.brief) + '</p>' : '') +
+        '<div class="enq-actions"><button type="button" class="btn-line btn-sm" data-toggle>' + (e.handled ? 'MARK UNHANDLED' : 'MARK HANDLED') + '</button>' +
+        '<button type="button" class="btn-line btn-sm danger" data-del>DELETE</button></div>';
+      $('[data-toggle]', card).addEventListener('click', async () => {
+        try {
+          await apiFetch('/enquiries?id=' + encodeURIComponent(e.id), {
+            method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ handled: !e.handled }),
+          });
+          e.handled = !e.handled;
+          updateBadge();
+          renderEnquiries();
+        } catch (err) { $('#enq-status').textContent = 'Error: ' + err.message; }
+      });
+      $('[data-del]', card).addEventListener('click', async () => {
+        if (!confirm('Delete this enquiry permanently?')) return;
+        try {
+          await apiFetch('/enquiries?id=' + encodeURIComponent(e.id), { method: 'DELETE' });
+          enquiries = enquiries.filter((x) => x.id !== e.id);
+          updateBadge();
+          renderEnquiries();
+        } catch (err) { $('#enq-status').textContent = 'Error: ' + err.message; }
+      });
+      host.appendChild(card);
+    });
+  }
+
+  async function loadEnquiries() {
+    $('#enq-status').textContent = 'Loading…';
+    try {
+      enquiries = (await apiFetch('/enquiries')).enquiries || [];
+      $('#enq-status').textContent = '';
+      updateBadge();
+      renderEnquiries();
+    } catch (err) {
+      $('#enq-status').textContent = 'Error: ' + err.message;
+    }
+  }
+
+  function showView(view) {
+    const isEnq = view === 'enquiries';
+    $('.admin-shell').classList.toggle('is-enquiries', isEnq);
+    $('#enquiries-view').hidden = !isEnq;
+    $$('.admin-tab').forEach((t) => {
+      const on = t.dataset.view === view;
+      t.classList.toggle('is-active', on);
+      t.setAttribute('aria-selected', String(on));
+    });
+    if (isEnq) loadEnquiries();
+  }
+
+  $$('.admin-tab').forEach((t) => t.addEventListener('click', () => showView(t.dataset.view)));
+  $('#enq-only-open').addEventListener('change', renderEnquiries);
+  $('#enq-refresh').addEventListener('click', loadEnquiries);
+
   // -------------------------------------------------------------------- boot --
   async function boot() {
+    showView('projects');
     try {
       await refreshList();
     } catch (err) {
       alert('Could not load projects: ' + err.message);
     }
+    // Populate the unhandled-count badge without switching views.
+    try {
+      enquiries = (await apiFetch('/enquiries')).enquiries || [];
+      updateBadge();
+    } catch { /* badge is best-effort */ }
   }
 
   if (token) {

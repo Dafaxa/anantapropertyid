@@ -127,3 +127,32 @@ button.btn, button.btn-line { cursor: pointer; }
   .admin-shell { grid-template-columns: 1fr; }
   .admin-list { border-right: 0; border-bottom: 1px solid var(--sand); max-height: 260px; overflow-y: auto; }
 }
+
+/* Header tabs + enquiries view */
+.admin-tabs { display: flex; gap: 4px; margin-left: 20px; margin-right: auto; }
+.admin-tab {
+  padding: 10px 16px; background: none; border: 0; border-bottom: 2px solid transparent; cursor: pointer;
+  font: 400 9.5px/1 var(--sans); letter-spacing: .18em; color: rgba(243, 240, 233, .66);
+}
+.admin-tab.is-active { color: var(--ivory); border-bottom-color: var(--gold); }
+.tab-badge { display: inline-block; min-width: 18px; padding: 3px 6px; margin-left: 6px; border-radius: 999px; background: var(--gold); color: var(--ink); font-size: 9px; text-align: center; }
+.tab-badge[hidden] { display: none; }
+
+.admin-shell.is-enquiries { grid-template-columns: 1fr; }
+.admin-shell.is-enquiries .admin-list, .admin-shell.is-enquiries .admin-form-wrap { display: none; }
+.enq-view { padding: 30px var(--pad-x) 80px; }
+.enq-view[hidden] { display: none; }
+.enq-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; padding: 14px 18px; background: var(--sand); }
+.enq-list { display: flex; flex-direction: column; gap: 10px; max-width: 900px; padding: 0 18px; }
+.enq-card { display: flex; flex-direction: column; gap: 10px; padding: 16px 18px; background: var(--ivory); border: 1px solid var(--sand); border-left: 3px solid var(--gold); }
+.enq-card.is-handled { opacity: .6; border-left-color: var(--slate); }
+.enq-head { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; align-items: baseline; }
+.enq-name { font: 500 15px/1.3 var(--serif); color: var(--ink); }
+.enq-meta { font: 300 10px/1.4 var(--sans); letter-spacing: .1em; color: var(--slate); }
+.enq-contact { display: flex; gap: 16px; flex-wrap: wrap; font: 300 12px/1.5 var(--sans); }
+.enq-contact a { color: var(--ink); border-bottom: 1px solid var(--gold); }
+.enq-brief { font: 300 12.5px/1.7 var(--sans); color: var(--body); white-space: pre-wrap; }
+.enq-tags { display: flex; gap: 6px; flex-wrap: wrap; }
+.enq-tags span { padding: 4px 9px; border: 1px solid var(--sand); font: 300 9px/1 var(--sans); letter-spacing: .12em; color: var(--slate); }
+.enq-actions { display: flex; gap: 8px; }
+@media (max-width: 860px) { .admin-tabs { margin-left: 8px; } .admin-header { flex-wrap: wrap; } }

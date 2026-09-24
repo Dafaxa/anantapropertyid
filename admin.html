@@ -35,6 +35,10 @@
       <span class="brand-name">ANANTA</span>
       <span class="brand-sub">PROPERTY™ ADMIN</span>
     </a>
+    <div class="admin-tabs" role="tablist">
+      <button type="button" class="admin-tab is-active" data-view="projects" role="tab" aria-selected="true">PROJECTS</button>
+      <button type="button" class="admin-tab" data-view="enquiries" role="tab" aria-selected="false">ENQUIRIES <span class="tab-badge" id="enq-badge" hidden>0</span></button>
+    </div>
     <div class="admin-header-actions">
       <a class="btn-line" href="index.html" target="_blank" rel="noopener">VIEW SITE ↗</a>
       <button type="button" class="btn-line" id="logout-btn">LOG OUT</button>
@@ -194,6 +198,18 @@
 
       </form>
     </main>
+
+    <section id="enquiries-view" class="enq-view" hidden aria-label="Enquiries">
+      <div class="enq-toolbar">
+        <p class="form-title">Enquiries</p>
+        <div class="form-topbar-actions">
+          <label class="check-inline"><input type="checkbox" id="enq-only-open" checked> Unhandled only</label>
+          <button type="button" class="btn-line btn-sm" id="enq-refresh">REFRESH</button>
+        </div>
+      </div>
+      <p id="enq-status" class="save-status" aria-live="polite"></p>
+      <div id="enq-list" class="enq-list"></div>
+    </section>
   </div>
 </div>
 
