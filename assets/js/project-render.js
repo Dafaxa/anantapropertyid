@@ -72,7 +72,6 @@
     }).join('');
 
     const views = (copy.plan_views && copy.plan_views.length) ? copy.plan_views : ['GROUND', 'UPPER', 'ROOF'];
-    q('.plan-frame').innerHTML = `<div class="placeholder">${PLAN_ICON}<span>Floorplan drawing to come</span></div>`;
     q('.plan-views').innerHTML = views.map((v, i) =>
       `<span${i === 0 ? ' style="background:var(--ink);border-color:var(--ink);color:var(--ivory)"' : ''}>${esc(v)}</span>`).join('');
 
@@ -82,9 +81,27 @@
     q('.unit-specs').innerHTML = (p.specs || [])
       .map((s) => `<div class="spec-row"><span>${esc(s.label)}</span><span>${esc(s.value)}</span></div>`).join('');
     q('.unit-detail .btn-ink').textContent = copy.tour_cta_label || 'WALK THIS VILLA IN 360°';
+    applyUnit(p, units[0]);
+  }
+
+  // Floorplan image and plan PDF follow the selected unit type.
+  function applyUnit(p, u) {
+    const copy = p.copy || {};
+    q('.plan-frame').innerHTML = u && u.floorplan_image
+      ? `<img src="${esc(u.floorplan_image)}" alt="${esc((u.name || '') + ' floorplan')}" loading="lazy" decoding="async" style="width:100%;height:100%;object-fit:contain;background:#fff">`
+      : `<div class="placeholder">${PLAN_ICON}<span>Floorplan drawing to come</span></div>`;
     const dl = q('.unit-detail .btn-line-ink');
-    dl.textContent = copy.download_label || 'DOWNLOAD PLAN PDF';
-    dl.setAttribute('href', 'contact.html?project=' + encQ(p.name));
+    if (u && u.plan_pdf) {
+      dl.textContent = copy.download_label || 'DOWNLOAD PLAN PDF';
+      dl.setAttribute('href', u.plan_pdf);
+      dl.setAttribute('target', '_blank');
+      dl.setAttribute('rel', 'noopener');
+    } else {
+      dl.textContent = 'REQUEST PLAN PDF';
+      dl.setAttribute('href', 'contact.html?project=' + encQ(p.name));
+      dl.removeAttribute('target');
+      dl.removeAttribute('rel');
+    }
   }
 
   function renderAmenities(p) {
@@ -95,7 +112,10 @@
 
   function renderLocation(p) {
     q('#location-title + p').textContent = p.location_region || '';
-    q('.map-frame').innerHTML = `<div class="placeholder">${MAP_ICON}<span>Location map to come</span></div>`;
+    const openLink = p.map_url ? `<a class="map-open" href="${esc(p.map_url)}" target="_blank" rel="noopener">OPEN IN MAPS &#8599;</a>` : '';
+    q('.map-frame').innerHTML = (p.map_image
+      ? `<img src="${esc(p.map_image)}" alt="Map of ${esc(p.name)}" loading="lazy" decoding="async">`
+      : `<div class="placeholder">${MAP_ICON}<span>Location map to come</span></div>`) + openLink;
     q('.location-points').innerHTML = (p.location_points || [])
       .map((l) => `<div class="spec-row"><span>${esc(l.label)}</span><span>${esc(l.value)}</span></div>`).join('');
   }
@@ -109,6 +129,11 @@
   function renderEnquiryLinks(p) {
     const confirmLink = q('.enquiry-card [data-confirm-slot]');
     if (confirmLink) confirmLink.setAttribute('href', 'contact.html?project=' + encQ(p.name));
+
+    const wa = q('.enquiry-card a[href^="https://wa.me"]');
+    if (wa) {
+      wa.setAttribute('href', wa.getAttribute('href').split('?')[0] + '?text=' + encodeURIComponent('Hi Ananta, I would like to know more about ' + p.name + '.'));
+    }
 
     const brochureLink = q('.enquiry-card [data-brochure-link]');
     if (brochureLink) {
@@ -207,6 +232,13 @@
     renderEnquiryLinks(p);
     renderTour(p);
     renderJsonLd(p);
+
+    document.addEventListener('click', (e) => {
+      const tab = e.target.closest('.tabs[data-choice-group="unit"] .tab');
+      if (!tab) return;
+      const idx = Array.from(tab.parentElement.children).indexOf(tab);
+      applyUnit(p, (p.units || [])[idx]);
+    });
 
     q('main').classList.remove('is-loading');
     window.AnantaPano && window.AnantaPano.init();

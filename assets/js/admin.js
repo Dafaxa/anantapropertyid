@@ -14,7 +14,13 @@
   // ---- array-field schemas: drives both the row markup and serialization ----
   const ARRAY_FIELDS = {
     stats: { fields: [{ key: 'label', type: 'text', ph: 'LOTS' }, { key: 'value', type: 'text', ph: '120' }] },
-    units: { fields: [{ key: 'code', type: 'text', ph: 'A' }, { key: 'name', type: 'text', ph: 'Type A' }, { key: 'area', type: 'text', ph: '248 m2 · 3 bedrooms' }] },
+    units: {
+      fields: [
+        { key: 'code', type: 'text', ph: 'A' }, { key: 'name', type: 'text', ph: 'Type A' }, { key: 'area', type: 'text', ph: '248 m2 · 3 bedrooms' },
+        { key: 'floorplan_image', type: 'image', label: 'Floorplan image' },
+        { key: 'plan_pdf', type: 'file', label: 'Plan PDF' },
+      ],
+    },
     specs: { fields: [{ key: 'label', type: 'text', ph: 'Master bedroom' }, { key: 'value', type: 'text', ph: '28 m2' }] },
     amenities: { fields: [{ key: 'name', type: 'text', ph: 'Infinity Pool' }, { key: 'image_url', type: 'image' }] },
     gallery: { fields: [{ key: 'image_url', type: 'image' }, { key: 'alt', type: 'text', ph: 'Villa exterior at golden hour' }] },
@@ -35,6 +41,7 @@
   let arrState = {}; // fieldName -> array of row objects, mutated in place by the UI
   let heroImages = { hero_image: '', card_image: '' };
   let brochureUrl = '';
+  let mapImage = '';
 
   // ---------------------------------------------------------------- auth --
   async function apiFetch(path, opts = {}) {
@@ -221,6 +228,8 @@
       schema.fields.forEach((f) => {
         if (f.type === 'image') {
           imageField(fieldsWrap, key + i + f.key, item[f.key] || '', (v) => { item[f.key] = v; }, f.label || f.key);
+        } else if (f.type === 'file') {
+          fileField(fieldsWrap, key + i + f.key, item[f.key] || '', (v) => { item[f.key] = v; }, f.label || f.key, 'application/pdf');
         } else {
           const label = document.createElement('label');
           label.className = 'field';
@@ -295,7 +304,7 @@
   // -------------------------------------------------------------- form <-> data --
   const TEXT_FIELDS = [
     'slug', 'name', 'location_label', 'location_short', 'location_region', 'location_city',
-    'tagline', 'intro_eyebrow', 'intro_title', 'intro_body', 'gallery_kicker', 'home_meta', 'home_lede',
+    'tagline', 'intro_eyebrow', 'intro_title', 'intro_body', 'gallery_kicker', 'home_meta', 'home_lede', 'map_url',
   ];
 
   function blankProject() {
@@ -303,7 +312,7 @@
     TEXT_FIELDS.forEach((k) => { p[k] = ''; });
     Object.keys(ARRAY_FIELDS).forEach((k) => { p[k] = []; });
     STRING_ARRAY_FIELDS.forEach((k) => { p[k] = []; });
-    p.hero_image = ''; p.card_image = ''; p.brochure_url = '';
+    p.hero_image = ''; p.card_image = ''; p.brochure_url = ''; p.map_image = '';
     return p;
   }
 
@@ -341,6 +350,11 @@
     imageField(heroHost, 'hero_image', heroImages.hero_image, (v) => { heroImages.hero_image = v; }, 'Hero image');
     imageField(heroHost, 'card_image', heroImages.card_image, (v) => { heroImages.card_image = v; }, 'Card image');
 
+    mapImage = p.map_image || '';
+    const mapHost = $('#img-map_image');
+    mapHost.innerHTML = '';
+    imageField(mapHost, 'map_image', mapImage, (v) => { mapImage = v; }, 'Map image');
+
     brochureUrl = p.brochure_url || '';
     const brochureHost = $('#file-brochure_url');
     brochureHost.innerHTML = '';
@@ -361,6 +375,7 @@
     out.hero_image = heroImages.hero_image;
     out.card_image = heroImages.card_image;
     out.brochure_url = brochureUrl;
+    out.map_image = mapImage;
 
     out.copy = {
       units_heading: $('#f-copy_units_heading').value.trim(),

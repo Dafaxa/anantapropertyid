@@ -6,6 +6,8 @@
 <title>Loading project… — Ananta Property</title>
 <meta name="description" content="Ananta Property development.">
 <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="manifest" href="/site.webmanifest">
 <!-- No <meta name="project-slug">: project-render.js reads ?slug=… from the
      URL instead. Used for any project added in the admin panel that isn't
      one of the three with a dedicated pretty filename. -->
@@ -24,6 +26,7 @@
 <script src="assets/js/project-render.js" defer></script>
 </head>
 <body>
+<a class="skip-link" href="#main">Skip to content</a>
 <div class="page" id="top" data-pdp>
 
 <header class="site-header">
@@ -39,7 +42,6 @@
     <a href="insights.html">INSIGHTS</a>
     <a href="index.html#about">ABOUT</a>
   </nav>
-  <span class="lang">EN&nbsp;/&nbsp;<a href="#top" lang="id" hreflang="id">ID</a></span>
   <a class="header-cta" href="contact.html">ENQUIRE</a>
   <button type="button" class="nav-toggle" aria-expanded="false" aria-controls="site-nav" aria-label="Toggle menu">
     <svg class="icon-menu" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
@@ -61,7 +63,7 @@
   </button>
 </div>
 
-<main class="is-loading">
+<main id="main" class="is-loading">
 
 <section class="pdp-hero" aria-labelledby="pdp-title">
   <div class="fill"></div>
