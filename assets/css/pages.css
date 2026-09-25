@@ -580,3 +580,29 @@ body { background: var(--ink); }
   font: 400 9px/1 var(--sans); letter-spacing: .18em;
 }
 .map-open:hover { background: var(--gold); color: var(--ink); }
+
+/* Package pages: portfolio, hover states, floating CTA */
+.portfolio-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr)); gap: clamp(14px, 1.8vw, 24px); }
+.portfolio-more { align-self: flex-start; }
+.module-card, .process-step { transition: background .25s ease; }
+.module-card:hover, .process-step:hover { background: #fbf9f4; }
+.module-card .module-num { transition: letter-spacing .25s ease; }
+.module-card:hover .module-num { letter-spacing: .38em; }
+.tag-cloud span { transition: background .2s ease, color .2s ease, border-color .2s ease; }
+.tag-cloud span:hover { background: var(--ink); color: var(--ivory); border-color: var(--ink); }
+
+.pkg-float {
+  position: fixed; right: clamp(14px, 2vw, 28px); bottom: clamp(14px, 2vw, 28px); z-index: 45;
+  padding: 16px 22px; background: var(--gold); color: var(--ink); box-shadow: 0 10px 30px rgba(11, 21, 24, .35);
+  font: 400 10px/1 var(--sans); letter-spacing: .2em; white-space: nowrap;
+  opacity: 0; transform: translateY(16px); pointer-events: none;
+  transition: opacity .3s ease, transform .3s ease;
+}
+.pkg-float.is-on { opacity: 1; transform: none; pointer-events: auto; }
+.pkg-float:hover { background: var(--ivory); }
+@media (max-width: 520px) {
+  .pkg-float { left: 14px; right: 14px; text-align: center; white-space: normal; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .pkg-float, .module-card, .process-step, .module-card .module-num { transition: none; }
+}

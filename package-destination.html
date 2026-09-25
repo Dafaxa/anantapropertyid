@@ -32,6 +32,7 @@
 <script src="assets/js/transitions.js" defer></script>
 <script src="assets/js/main.js" defer></script>
 <script src="assets/js/pages.js" defer></script>
+<script src="assets/js/package-portfolio.js" defer></script>
 <script defer src="/_vercel/insights/script.js"></script>
 </head>
 <body>
@@ -63,6 +64,7 @@
   <nav aria-label="Sections">
     <a class="is-active" href="#overview">OVERVIEW</a>
     <a href="#modules">WHAT WE BUILD</a>
+    <a href="#portfolio">WORK</a>
     <a href="#process">PROCESS</a>
     <a href="#ideal">IDEAL FOR</a>
   </nav>
@@ -103,7 +105,7 @@
 </section>
 
 <section class="pdp-section" aria-label="The Destination Experience package, at a glance." style="padding-top:0">
-  <figure class="poster-figure">
+  <figure class="poster-figure" data-reveal>
     <img src="assets/img/pkg-5.webp" loading="lazy" decoding="async" alt="The Destination Experience package, at a glance.">
     <figcaption>The Destination Experience package, at a glance.</figcaption>
   </figure>
@@ -115,7 +117,7 @@
     <p>THE FROM DESTINATIONS TO LASTING VALUE SYSTEM</p>
   </div>
   <div class="module-grid">
-    <article class="module-card">
+    <article class="module-card" data-reveal>
       <span class="module-num">01</span>
       <h3>Destination Strategy &amp; Positioning</h3>
       <p>Define what makes the destination worth travelling for.</p>
@@ -127,7 +129,7 @@
         <li>Experience strategy & brand proposition</li>
       </ul>
     </article>
-    <article class="module-card">
+    <article class="module-card" data-reveal>
       <span class="module-num">02</span>
       <h3>Brand &amp; Storytelling</h3>
       <p>Create a destination identity with cultural and emotional relevance.</p>
@@ -138,7 +140,7 @@
         <li>Campaign concept & content strategy</li>
       </ul>
     </article>
-    <article class="module-card">
+    <article class="module-card" data-reveal>
       <span class="module-num">03</span>
       <h3>Visualization &amp; Cinematic Content</h3>
       <p>Show the destination before it is fully built.</p>
@@ -150,7 +152,7 @@
         <li>Social content</li>
       </ul>
     </article>
-    <article class="module-card">
+    <article class="module-card" data-reveal>
       <span class="module-num">04</span>
       <h3>Digital Experience &amp; Booking Journey</h3>
       <p>Turn inspiration into action.</p>
@@ -163,7 +165,7 @@
         <li>Interactive destination experience</li>
       </ul>
     </article>
-    <article class="module-card">
+    <article class="module-card" data-reveal>
       <span class="module-num">05</span>
       <h3>Marketing &amp; Global Reach</h3>
       <p>Build awareness beyond the local market.</p>
@@ -175,7 +177,7 @@
         <li>International campaigns & partnerships</li>
       </ul>
     </article>
-    <article class="module-card">
+    <article class="module-card" data-reveal>
       <span class="module-num">06</span>
       <h3>Sales Enablement</h3>
       <p>Connect the destination proposition to commercial opportunities.</p>
@@ -189,6 +191,15 @@
   </div>
 </section>
 
+<section class="pdp-section" id="portfolio" aria-labelledby="portfolio-title">
+  <div class="pdp-section-head">
+    <h2 id="portfolio-title">Selected work</h2>
+    <p>PROJECTS WE HAVE BROUGHT TO MARKET</p>
+  </div>
+  <div class="portfolio-grid" data-portfolio data-prefer="Villa,Masterplan"></div>
+  <a class="u-link portfolio-more" href="projects.html">SEE ALL PROJECTS &#8594;</a>
+</section>
+
 <section class="quote-band" aria-label="Outcome">
   <blockquote><p>It becomes a reason to go.</p></blockquote>
 </section>
@@ -199,13 +210,13 @@
     <p>HOW WE GET THERE</p>
   </div>
   <div class="process-grid">
-    <div class="process-step"><span class="process-num">01</span><p>DISCOVER — the destination is found</p></div>
-    <div class="process-step"><span class="process-num">02</span><p>DESIRE — the destination is wanted</p></div>
-    <div class="process-step"><span class="process-num">03</span><p>VISIT — the destination is reached</p></div>
-    <div class="process-step"><span class="process-num">04</span><p>EXPERIENCE — the destination is lived</p></div>
-    <div class="process-step"><span class="process-num">05</span><p>SHARE — the destination is told</p></div>
-    <div class="process-step"><span class="process-num">06</span><p>RETURN — the destination is revisited</p></div>
-    <div class="process-step"><span class="process-num">07</span><p>INVEST — the destination becomes value</p></div>
+    <div class="process-step" data-reveal><span class="process-num">01</span><p>DISCOVER — the destination is found</p></div>
+    <div class="process-step" data-reveal><span class="process-num">02</span><p>DESIRE — the destination is wanted</p></div>
+    <div class="process-step" data-reveal><span class="process-num">03</span><p>VISIT — the destination is reached</p></div>
+    <div class="process-step" data-reveal><span class="process-num">04</span><p>EXPERIENCE — the destination is lived</p></div>
+    <div class="process-step" data-reveal><span class="process-num">05</span><p>SHARE — the destination is told</p></div>
+    <div class="process-step" data-reveal><span class="process-num">06</span><p>RETURN — the destination is revisited</p></div>
+    <div class="process-step" data-reveal><span class="process-num">07</span><p>INVEST — the destination becomes value</p></div>
   </div>
 </section>
 

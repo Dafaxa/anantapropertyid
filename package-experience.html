@@ -32,6 +32,7 @@
 <script src="assets/js/transitions.js" defer></script>
 <script src="assets/js/main.js" defer></script>
 <script src="assets/js/pages.js" defer></script>
+<script src="assets/js/package-portfolio.js" defer></script>
 <script defer src="/_vercel/insights/script.js"></script>
 </head>
 <body>
@@ -63,6 +64,7 @@
   <nav aria-label="Sections">
     <a class="is-active" href="#overview">OVERVIEW</a>
     <a href="#modules">WHAT WE BUILD</a>
+    <a href="#portfolio">WORK</a>
     <a href="#process">PROCESS</a>
     <a href="#ideal">IDEAL FOR</a>
   </nav>
@@ -103,7 +105,7 @@
 </section>
 
 <section class="pdp-section" aria-label="The Property Experience package, at a glance." style="padding-top:0">
-  <figure class="poster-figure">
+  <figure class="poster-figure" data-reveal>
     <img src="assets/img/pkg-4.webp" loading="lazy" decoding="async" alt="The Property Experience package, at a glance.">
     <figcaption>The Property Experience package, at a glance.</figcaption>
   </figure>
@@ -115,7 +117,7 @@
     <p>THE LET BUYERS EXPERIENCE THE FUTURE SYSTEM</p>
   </div>
   <div class="module-grid">
-    <article class="module-card">
+    <article class="module-card" data-reveal>
       <span class="module-num">01</span>
       <h3>Interactive Masterplan</h3>
       <p>Allow buyers to understand the entire development.</p>
@@ -126,7 +128,7 @@
         <li>Roads & points of interest</li>
       </ul>
     </article>
-    <article class="module-card">
+    <article class="module-card" data-reveal>
       <span class="module-num">02</span>
       <h3>Digital Twin &amp; 3D Experience</h3>
       <p>Create a navigable digital representation of the development.</p>
@@ -139,7 +141,7 @@
         <li>Interactive hotspots</li>
       </ul>
     </article>
-    <article class="module-card">
+    <article class="module-card" data-reveal>
       <span class="module-num">03</span>
       <h3>Unit Explorer &amp; 360° Tours</h3>
       <p>Help buyers compare and understand units.</p>
@@ -152,7 +154,7 @@
         <li>Unit comparison</li>
       </ul>
     </article>
-    <article class="module-card">
+    <article class="module-card" data-reveal>
       <span class="module-num">04</span>
       <h3>Sales Gallery Integration</h3>
       <p>Transform the experience center into an interactive sales environment.</p>
@@ -164,7 +166,7 @@
         <li>Website</li>
       </ul>
     </article>
-    <article class="module-card">
+    <article class="module-card" data-reveal>
       <span class="module-num">05</span>
       <h3>CRM &amp; Lead Management</h3>
       <p>Connect the experience to your sales pipeline.</p>
@@ -178,6 +180,15 @@
   </div>
 </section>
 
+<section class="pdp-section" id="portfolio" aria-labelledby="portfolio-title">
+  <div class="pdp-section-head">
+    <h2 id="portfolio-title">Selected work</h2>
+    <p>PROJECTS WE HAVE BROUGHT TO MARKET</p>
+  </div>
+  <div class="portfolio-grid" data-portfolio data-prefer="Masterplan,Apartment"></div>
+  <a class="u-link portfolio-more" href="projects.html">SEE ALL PROJECTS &#8594;</a>
+</section>
+
 <section class="quote-band" aria-label="Outcome">
   <blockquote><p>Complex property information becomes a simple, immersive buying experience.</p></blockquote>
 </section>
@@ -188,11 +199,11 @@
     <p>HOW WE GET THERE</p>
   </div>
   <div class="process-grid">
-    <div class="process-step"><span class="process-num">01</span><p>MODEL — build the spatial and data model of the development</p></div>
-    <div class="process-step"><span class="process-num">02</span><p>DESIGN — design the masterplan, unit explorer and 360° flows</p></div>
-    <div class="process-step"><span class="process-num">03</span><p>DEVELOP — build the interactive experience</p></div>
-    <div class="process-step"><span class="process-num">04</span><p>INTEGRATE — connect it to the sales gallery and CRM</p></div>
-    <div class="process-step"><span class="process-num">05</span><p>DEPLOY — put it in front of buyers, on every device</p></div>
+    <div class="process-step" data-reveal><span class="process-num">01</span><p>MODEL — build the spatial and data model of the development</p></div>
+    <div class="process-step" data-reveal><span class="process-num">02</span><p>DESIGN — design the masterplan, unit explorer and 360° flows</p></div>
+    <div class="process-step" data-reveal><span class="process-num">03</span><p>DEVELOP — build the interactive experience</p></div>
+    <div class="process-step" data-reveal><span class="process-num">04</span><p>INTEGRATE — connect it to the sales gallery and CRM</p></div>
+    <div class="process-step" data-reveal><span class="process-num">05</span><p>DEPLOY — put it in front of buyers, on every device</p></div>
   </div>
 </section>
 

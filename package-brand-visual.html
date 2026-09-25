@@ -32,6 +32,7 @@
 <script src="assets/js/transitions.js" defer></script>
 <script src="assets/js/main.js" defer></script>
 <script src="assets/js/pages.js" defer></script>
+<script src="assets/js/package-portfolio.js" defer></script>
 <script defer src="/_vercel/insights/script.js"></script>
 </head>
 <body>
@@ -63,6 +64,7 @@
   <nav aria-label="Sections">
     <a class="is-active" href="#overview">OVERVIEW</a>
     <a href="#modules">WHAT WE BUILD</a>
+    <a href="#portfolio">WORK</a>
     <a href="#process">PROCESS</a>
     <a href="#ideal">IDEAL FOR</a>
   </nav>
@@ -103,7 +105,7 @@
 </section>
 
 <section class="pdp-section" aria-label="The Property Brand & Visual package, at a glance." style="padding-top:0">
-  <figure class="poster-figure">
+  <figure class="poster-figure" data-reveal>
     <img src="assets/img/pkg-1.webp" loading="lazy" decoding="async" alt="The Property Brand & Visual package, at a glance.">
     <figcaption>The Property Brand & Visual package, at a glance.</figcaption>
   </figure>
@@ -115,7 +117,7 @@
     <p>THE BUILD DESIRABILITY SYSTEM</p>
   </div>
   <div class="module-grid">
-    <article class="module-card">
+    <article class="module-card" data-reveal>
       <span class="module-num">01</span>
       <h3>Property Positioning</h3>
       <p>Define what makes the development valuable and why buyers should care.</p>
@@ -129,7 +131,7 @@
         <li>Brand messaging framework</li>
       </ul>
     </article>
-    <article class="module-card">
+    <article class="module-card" data-reveal>
       <span class="module-num">02</span>
       <h3>Naming &amp; Brand Identity</h3>
       <p>Create a name and identity that gives the project a recognizable presence.</p>
@@ -143,7 +145,7 @@
         <li>Brand guidelines</li>
       </ul>
     </article>
-    <article class="module-card">
+    <article class="module-card" data-reveal>
       <span class="module-num">03</span>
       <h3>Storytelling &amp; Messaging</h3>
       <p>Turn the property into a story rather than a collection of features.</p>
@@ -156,7 +158,7 @@
         <li>Campaign messaging</li>
       </ul>
     </article>
-    <article class="module-card">
+    <article class="module-card" data-reveal>
       <span class="module-num">04</span>
       <h3>Architectural Visualization</h3>
       <p>Show buyers what doesn't exist yet.</p>
@@ -169,7 +171,7 @@
         <li>Key visual development</li>
       </ul>
     </article>
-    <article class="module-card">
+    <article class="module-card" data-reveal>
       <span class="module-num">05</span>
       <h3>Marketing Visual System</h3>
       <p>Create the visual foundation for future campaigns.</p>
@@ -185,6 +187,15 @@
   </div>
 </section>
 
+<section class="pdp-section" id="portfolio" aria-labelledby="portfolio-title">
+  <div class="pdp-section-head">
+    <h2 id="portfolio-title">Selected work</h2>
+    <p>PROJECTS WE HAVE BROUGHT TO MARKET</p>
+  </div>
+  <div class="portfolio-grid" data-portfolio></div>
+  <a class="u-link portfolio-more" href="projects.html">SEE ALL PROJECTS &#8594;</a>
+</section>
+
 <section class="quote-band" aria-label="Outcome">
   <blockquote><p>A property that doesn't simply look premium — it feels distinctive.</p></blockquote>
 </section>
@@ -195,11 +206,11 @@
     <p>HOW WE GET THERE</p>
   </div>
   <div class="process-grid">
-    <div class="process-step"><span class="process-num">01</span><p>DISCOVER — understand the property, market and buyer</p></div>
-    <div class="process-step"><span class="process-num">02</span><p>POSITION — define the strategic opportunity</p></div>
-    <div class="process-step"><span class="process-num">03</span><p>CREATE — build the brand and visual identity</p></div>
-    <div class="process-step"><span class="process-num">04</span><p>VISUALIZE — bring the property to life</p></div>
-    <div class="process-step"><span class="process-num">05</span><p>DELIVER — hand over the complete brand system</p></div>
+    <div class="process-step" data-reveal><span class="process-num">01</span><p>DISCOVER — understand the property, market and buyer</p></div>
+    <div class="process-step" data-reveal><span class="process-num">02</span><p>POSITION — define the strategic opportunity</p></div>
+    <div class="process-step" data-reveal><span class="process-num">03</span><p>CREATE — build the brand and visual identity</p></div>
+    <div class="process-step" data-reveal><span class="process-num">04</span><p>VISUALIZE — bring the property to life</p></div>
+    <div class="process-step" data-reveal><span class="process-num">05</span><p>DELIVER — hand over the complete brand system</p></div>
   </div>
 </section>
 
