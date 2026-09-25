@@ -8,22 +8,25 @@
   const SUPABASE_KEY = 'sb_publishable_sXrbQ0YVe492bNBtL0lzRw_MO2oieqL';
   const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
-  function card(it) {
-    const linked = !!it.link_url;
-    const tag = it.tag ? `<span class="p-tag cat">${esc(it.tag.toUpperCase())}</span>` : '';
+  function card(it, i) {
+    const num = String(i + 1).padStart(2, '0');
     const media = it.image_url
       ? `<img src="${esc(it.image_url)}" loading="lazy" decoding="async" alt="${esc(it.title)}">`
-      : '<div class="placeholder"><span>Image to come</span></div>';
-    const body =
-      `<div class="media">${media}${tag}</div>` +
-      `<div class="p-body"><div class="p-title"><span>${esc(it.title)}</span><span>${esc(it.year || '')}</span></div>` +
-      (it.subtitle ? `<p class="p-loc">${esc(it.subtitle)}</p>` : '') +
-      (it.description ? `<p class="p-desc">${esc(it.description)}</p>` : '') +
-      (linked ? '<div class="p-foot"><span>VIEW WORK</span><span aria-hidden="true">&#10230;</span></div>' : '') +
+      : '';
+    const inner =
+      `<div class="pf-media">${media}</div>` +
+      `<span class="pf-num" aria-hidden="true">${num}</span>` +
+      (it.tag ? `<span class="pf-tag">${esc(it.tag.toUpperCase())}</span>` : '') +
+      '<div class="pf-copy">' +
+      (it.subtitle ? `<p class="pf-sub">${esc(it.subtitle)}${it.year ? ' · ' + esc(it.year) : ''}</p>` : (it.year ? `<p class="pf-sub">${esc(it.year)}</p>` : '')) +
+      `<h3 class="pf-title">${esc(it.title)}</h3>` +
+      (it.description ? `<p class="pf-desc">${esc(it.description)}</p>` : '') +
+      (it.link_url ? '<span class="pf-more">VIEW WORK <i aria-hidden="true">&#10230;</i></span>' : '') +
       '</div>';
-    return linked
-      ? `<a class="p-card" href="${esc(it.link_url)}" target="_blank" rel="noopener" data-reveal>${body}</a>`
-      : `<article class="p-card" data-reveal>${body}</article>`;
+    const cls = 'pf-item' + (it.image_url ? '' : ' is-bare');
+    return it.link_url
+      ? `<a class="${cls}" href="${esc(it.link_url)}" target="_blank" rel="noopener" data-reveal>${inner}</a>`
+      : `<article class="${cls}" data-reveal>${inner}</article>`;
   }
 
   async function portfolio() {
@@ -44,7 +47,9 @@
     } catch { /* section hides below */ }
     if (!rows.length) return hide();
 
-    grid.innerHTML = rows.slice(0, 9).map(card).join('');
+    const shown = rows.slice(0, 9);
+    grid.dataset.count = String(shown.length);
+    grid.innerHTML = shown.map(card).join('');
     window.AnantaReveal && window.AnantaReveal.rescan();
   }
 
