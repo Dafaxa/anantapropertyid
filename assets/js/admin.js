@@ -120,7 +120,7 @@
       try {
         const form = new FormData();
         form.append('file', file);
-        form.append('folder', ($('#f-slug').value.trim() || 'misc'));
+        form.append('folder', (wrap.closest('[data-folder]') ? wrap.closest('[data-folder]').dataset.folder : '') || $('#f-slug').value.trim() || 'misc');
         const res = await fetch(API + '/upload', { method: 'POST', headers: { 'x-admin-token': token }, body: form });
         const data = await res.json();
         if (!res.ok) throw new Error(data.error || 'Upload failed');
@@ -522,10 +522,95 @@
     }
   }
 
+  // ------------------------------------------------------------- portfolio --
+  let pfItems = [];
+
+  function pfCard(item) {
+    const card = document.createElement('article');
+    card.className = 'enq-card pf-card';
+    card.dataset.folder = 'portfolio-' + item.package;
+    card.innerHTML =
+      '<div class="grid-2">' +
+      '<label class="field"><span>Title *</span><input type="text" data-f="title" value="' + escAttr(item.title || '') + '"></label>' +
+      '<label class="field"><span>Subtitle (client / place)</span><input type="text" data-f="subtitle" value="' + escAttr(item.subtitle || '') + '" placeholder="Villa collection · Uluwatu, Bali"></label>' +
+      '<label class="field"><span>Tag (what we delivered)</span><input type="text" data-f="tag" value="' + escAttr(item.tag || '') + '" placeholder="BRAND IDENTITY"></label>' +
+      '<label class="field"><span>Year</span><input type="number" data-f="year" value="' + escAttr(item.year || '') + '"></label>' +
+      '<label class="field"><span>Link (optional)</span><input type="url" data-f="link_url" value="' + escAttr(item.link_url || '') + '" placeholder="https://..."></label>' +
+      '<label class="field"><span>Sort order</span><input type="number" data-f="sort_order" value="' + escAttr(item.sort_order ?? 0) + '"></label>' +
+      '</div>' +
+      '<label class="field"><span>Description</span><textarea data-f="description" rows="2">' + escHtml(item.description || '') + '</textarea></label>' +
+      '<div data-img></div>' +
+      '<div class="enq-actions"><label class="check-inline"><input type="checkbox" data-f="published"' + (item.published ? ' checked' : '') + '> Published</label>' +
+      '<button type="button" class="btn btn-gold btn-sm" data-save>SAVE</button>' +
+      '<button type="button" class="btn-line btn-sm danger" data-del>DELETE</button>' +
+      '<span class="hint" data-msg style="margin:0"></span></div>';
+    let img = item.image_url || '';
+    imageField($('[data-img]', card), 'pf_image', img, (v) => { img = v; }, 'Image');
+    const f = (k) => $('[data-f="' + k + '"]', card);
+    const msg = $('[data-msg]', card);
+
+    $('[data-save]', card).addEventListener('click', async () => {
+      const body = {
+        package: item.package, title: f('title').value.trim(), subtitle: f('subtitle').value.trim(), tag: f('tag').value.trim(),
+        year: Number(f('year').value || 0) || null, link_url: f('link_url').value.trim(), sort_order: Number(f('sort_order').value || 0),
+        description: f('description').value.trim(), image_url: img, published: f('published').checked,
+      };
+      if (!body.title) { msg.textContent = 'Title is required.'; return; }
+      msg.textContent = 'Saving…';
+      try {
+        const res = item.id
+          ? await apiFetch('/portfolio?id=' + encodeURIComponent(item.id), { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })
+          : await apiFetch('/portfolio', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+        Object.assign(item, res.item);
+        msg.textContent = 'Saved.';
+      } catch (err) { msg.textContent = 'Error: ' + err.message; }
+    });
+    $('[data-del]', card).addEventListener('click', async () => {
+      if (item.id) {
+        if (!confirm('Delete this work item?')) return;
+        try { await apiFetch('/portfolio?id=' + encodeURIComponent(item.id), { method: 'DELETE' }); }
+        catch (err) { msg.textContent = 'Error: ' + err.message; return; }
+        pfItems = pfItems.filter((x) => x.id !== item.id);
+      } else {
+        pfItems = pfItems.filter((x) => x !== item);
+      }
+      renderPortfolio();
+    });
+    return card;
+  }
+
+  function renderPortfolio() {
+    const pkg = $('#pf-package').value;
+    const host = $('#pf-list');
+    host.innerHTML = '';
+    const list = pfItems.filter((x) => x.package === pkg);
+    if (!list.length) host.innerHTML = '<p class="hint" style="margin:0">No work added for this package yet.</p>';
+    list.forEach((it) => host.appendChild(pfCard(it)));
+  }
+
+  async function loadPortfolio() {
+    $('#pf-status').textContent = 'Loading…';
+    try {
+      pfItems = (await apiFetch('/portfolio')).items || [];
+      $('#pf-status').textContent = '';
+      renderPortfolio();
+    } catch (err) { $('#pf-status').textContent = 'Error: ' + err.message; }
+  }
+
+  $('#pf-package').addEventListener('change', renderPortfolio);
+  $('#pf-add').addEventListener('click', () => {
+    const pkg = $('#pf-package').value;
+    pfItems.push({ package: pkg, title: '', subtitle: '', tag: '', year: new Date().getFullYear(), description: '', image_url: '', link_url: '', sort_order: pfItems.filter((x) => x.package === pkg).length + 1, published: true });
+    renderPortfolio();
+  });
+
   function showView(view) {
     const isEnq = view === 'enquiries';
-    $('.admin-shell').classList.toggle('is-enquiries', isEnq);
+    const isPf = view === 'portfolio';
+    $('.admin-shell').classList.toggle('is-enquiries', isEnq || isPf);
     $('#enquiries-view').hidden = !isEnq;
+    $('#portfolio-view').hidden = !isPf;
+    if (isPf) loadPortfolio();
     $$('.admin-tab').forEach((t) => {
       const on = t.dataset.view === view;
       t.classList.toggle('is-active', on);

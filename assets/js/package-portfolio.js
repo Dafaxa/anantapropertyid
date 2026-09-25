@@ -1,46 +1,50 @@
-/* Ananta Property — package pages: "Selected work" portfolio + floating CTA.
-   The portfolio reads published projects from the CMS (same public,
-   RLS-protected table the rest of the site uses), so it follows whatever is
-   published in the admin panel. Projects whose category matches the page's
-   data-prefer list are shown first. If the fetch fails or nothing is
-   published, the whole section hides itself. */
+/* Ananta Property — package pages: standalone "Selected work" + floating CTA.
+   The work shown here is its own list (public.portfolio_items, one set per
+   package, edited under "Package portfolio" in the admin panel) and is
+   separate from the Projects list. The section, and its sub-nav link, hide
+   themselves when a package has no published work or the fetch fails. */
 (() => {
   const SUPABASE_URL = 'https://slunqshpbugvwgliefyo.supabase.co';
   const SUPABASE_KEY = 'sb_publishable_sXrbQ0YVe492bNBtL0lzRw_MO2oieqL';
-  const PRETTY = { residences: 'residences.html', 'sky-suites': 'sky-suites.html', 'grand-masterplan': 'grand-masterplan.html' };
-  const urlFor = (slug) => PRETTY[slug] || ('project.html?slug=' + encodeURIComponent(slug));
   const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
-  function card(p) {
-    const facts = (p.card_facts || []).slice(0, 2);
-    const launching = p.status === 'Launching';
-    return `<a class="p-card" href="${esc(urlFor(p.slug))}" data-reveal>` +
-      `<div class="media"><img src="${esc(p.card_image || p.hero_image)}" loading="lazy" decoding="async" alt="${esc(p.name)}">` +
-      `<span class="p-tag cat">${esc((p.category || '').toUpperCase())}</span>` +
-      `<span class="p-tag status${launching ? ' is-launching' : ''}">${esc((p.status || '').toUpperCase())}</span></div>` +
-      `<div class="p-body"><div class="p-title"><span>${esc(p.name)}</span><span>${esc(p.year)}</span></div>` +
-      `<p class="p-loc">${esc(p.location_city)}</p>` +
-      `<div class="p-facts">${facts.map((f) => `<span>${esc(f)}</span>`).join('')}</div>` +
-      `<div class="p-foot"><span>VIEW PROJECT</span><span aria-hidden="true">&#10230;</span></div></div></a>`;
+  function card(it) {
+    const linked = !!it.link_url;
+    const tag = it.tag ? `<span class="p-tag cat">${esc(it.tag.toUpperCase())}</span>` : '';
+    const media = it.image_url
+      ? `<img src="${esc(it.image_url)}" loading="lazy" decoding="async" alt="${esc(it.title)}">`
+      : '<div class="placeholder"><span>Image to come</span></div>';
+    const body =
+      `<div class="media">${media}${tag}</div>` +
+      `<div class="p-body"><div class="p-title"><span>${esc(it.title)}</span><span>${esc(it.year || '')}</span></div>` +
+      (it.subtitle ? `<p class="p-loc">${esc(it.subtitle)}</p>` : '') +
+      (it.description ? `<p class="p-desc">${esc(it.description)}</p>` : '') +
+      (linked ? '<div class="p-foot"><span>VIEW WORK</span><span aria-hidden="true">&#10230;</span></div>' : '') +
+      '</div>';
+    return linked
+      ? `<a class="p-card" href="${esc(it.link_url)}" target="_blank" rel="noopener" data-reveal>${body}</a>`
+      : `<article class="p-card" data-reveal>${body}</article>`;
   }
 
   async function portfolio() {
     const grid = document.querySelector('[data-portfolio]');
     if (!grid) return;
     const section = grid.closest('section');
-    const hide = () => { if (section) section.style.display = 'none'; };
+    const hide = () => {
+      if (section) section.style.display = 'none';
+      const link = document.querySelector('.subnav nav a[href="#portfolio"]');
+      if (link) link.remove();
+    };
     let rows = [];
     try {
-      const res = await fetch(`${SUPABASE_URL}/rest/v1/projects?published=eq.true&select=*&order=sort_order.asc`,
+      const pkg = encodeURIComponent(grid.dataset.package || '');
+      const res = await fetch(`${SUPABASE_URL}/rest/v1/portfolio_items?published=eq.true&package=eq.${pkg}&select=*&order=sort_order.asc`,
         { headers: { apikey: SUPABASE_KEY, Authorization: 'Bearer ' + SUPABASE_KEY } });
       rows = res.ok ? await res.json() : [];
     } catch { /* section hides below */ }
     if (!rows.length) return hide();
 
-    const prefer = (grid.dataset.prefer || '').split(',').map((s) => s.trim()).filter(Boolean);
-    const rank = (p) => { const i = prefer.indexOf(p.category); return i === -1 ? prefer.length : i; };
-    rows.sort((a, b) => rank(a) - rank(b));
-    grid.innerHTML = rows.slice(0, 6).map(card).join('');
+    grid.innerHTML = rows.slice(0, 9).map(card).join('');
     window.AnantaReveal && window.AnantaReveal.rescan();
   }
 
@@ -69,6 +73,7 @@
     const band = document.querySelector('.cta-band');
     if (band) new IntersectionObserver(([e]) => { bandIn = e.isIntersecting; sync(); }).observe(band);
   }
+
 
   const start = () => { portfolio(); floatingCta(); };
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start);

@@ -606,3 +606,6 @@ body { background: var(--ink); }
 @media (prefers-reduced-motion: reduce) {
   .pkg-float, .module-card, .process-step, .module-card .module-num { transition: none; }
 }
+
+.p-desc { font: 300 12.5px/1.65 var(--sans); color: var(--body); display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; }
+.portfolio-grid .p-card:not(a) { cursor: default; }

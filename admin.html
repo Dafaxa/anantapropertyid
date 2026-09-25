@@ -37,6 +37,7 @@
     </a>
     <div class="admin-tabs" role="tablist">
       <button type="button" class="admin-tab is-active" data-view="projects" role="tab" aria-selected="true">PROJECTS</button>
+      <button type="button" class="admin-tab" data-view="portfolio" role="tab" aria-selected="false">PACKAGE PORTFOLIO</button>
       <button type="button" class="admin-tab" data-view="enquiries" role="tab" aria-selected="false">ENQUIRIES <span class="tab-badge" id="enq-badge" hidden>0</span></button>
     </div>
     <div class="admin-header-actions">
@@ -205,6 +206,27 @@
 
       </form>
     </main>
+
+    <section id="portfolio-view" class="enq-view" hidden aria-label="Package portfolio">
+      <div class="enq-toolbar">
+        <p class="form-title">Package portfolio</p>
+        <div class="form-topbar-actions">
+          <label class="check-inline">Package
+            <select id="pf-package">
+              <option value="brand-visual">01 · Property Brand &amp; Visual</option>
+              <option value="launch">02 · Property Launch</option>
+              <option value="luxury-launch">03 · Luxury Property Launch</option>
+              <option value="experience">04 · Property Experience</option>
+              <option value="destination">05 · Destination Experience</option>
+            </select>
+          </label>
+          <button type="button" class="btn btn-gold btn-sm" id="pf-add">+ ADD WORK</button>
+        </div>
+      </div>
+      <p class="hint" style="padding:0 18px;margin:8px 0">Work shown in the "Selected work" section of that package's page. Separate from the Projects list. A package with no published work hides the section.</p>
+      <p id="pf-status" class="save-status" aria-live="polite"></p>
+      <div id="pf-list" class="enq-list"></div>
+    </section>
 
     <section id="enquiries-view" class="enq-view" hidden aria-label="Enquiries">
       <div class="enq-toolbar">
