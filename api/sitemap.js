@@ -10,7 +10,7 @@ const STATIC = [
   ['package-brand-visual.html', 'monthly', '0.7'], ['package-launch.html', 'monthly', '0.7'],
   ['package-luxury-launch.html', 'monthly', '0.7'], ['package-experience.html', 'monthly', '0.7'],
   ['package-destination.html', 'monthly', '0.7'], ['insights.html', 'weekly', '0.6'],
-  ['article.html', 'monthly', '0.5'], ['contact.html', 'monthly', '0.6'],
+  ['contact.html', 'monthly', '0.6'],
 ];
 const xml = (s) => String(s).replace(/[<>&'"]/g, (c) => ({ '<': '&lt;', '>': '&gt;', '&': '&amp;', "'": '&apos;', '"': '&quot;' }[c]));
 const day = (d) => (d ? new Date(d).toISOString().slice(0, 10) : new Date().toISOString().slice(0, 10));
@@ -19,6 +19,12 @@ const entry = (path, freq, prio, last) =>
 
 module.exports = async (req, res) => {
   let projects = [];
+  let articles = [];
+  try {
+    const ra = await fetch(`${SUPABASE_URL}/rest/v1/articles?published=eq.true&select=slug,updated_at&order=published_at.desc`,
+      { headers: { apikey: SUPABASE_KEY, Authorization: 'Bearer ' + SUPABASE_KEY } });
+    if (ra.ok) articles = await ra.json();
+  } catch { /* articles omitted */ }
   try {
     const r = await fetch(`${SUPABASE_URL}/rest/v1/projects?published=eq.true&select=slug,updated_at&order=sort_order.asc`,
       { headers: { apikey: SUPABASE_KEY, Authorization: 'Bearer ' + SUPABASE_KEY } });
@@ -27,7 +33,8 @@ module.exports = async (req, res) => {
 
   const today = day();
   const urls = STATIC.map(([p, f, pr]) => entry(p, f, pr, today))
-    .concat(projects.map((p) => entry(PRETTY[p.slug] || 'project.html?slug=' + encodeURIComponent(p.slug), 'weekly', '0.8', day(p.updated_at))));
+    .concat(projects.map((p) => entry(PRETTY[p.slug] || 'project.html?slug=' + encodeURIComponent(p.slug), 'weekly', '0.8', day(p.updated_at))))
+    .concat(articles.map((a) => entry('article.html?slug=' + encodeURIComponent(a.slug), 'monthly', '0.6', day(a.updated_at))));
 
   res.setHeader('Content-Type', 'application/xml; charset=utf-8');
   res.setHeader('Cache-Control', 'public, s-maxage=3600, stale-while-revalidate=86400');

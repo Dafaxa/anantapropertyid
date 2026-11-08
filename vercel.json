@@ -1,3 +1,14 @@
 {
-  "rewrites": [{ "source": "/sitemap.xml", "destination": "/api/sitemap" }]
+  "rewrites": [
+    {
+      "source": "/sitemap.xml",
+      "destination": "/api/sitemap"
+    }
+  ],
+  "crons": [
+    {
+      "path": "/api/keepalive",
+      "schedule": "0 3 * * *"
+    }
+  ]
 }

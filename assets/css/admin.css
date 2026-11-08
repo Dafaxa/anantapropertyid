@@ -156,3 +156,11 @@ button.btn, button.btn-line { cursor: pointer; }
 .enq-tags span { padding: 4px 9px; border: 1px solid var(--sand); font: 300 9px/1 var(--sans); letter-spacing: .12em; color: var(--slate); }
 .enq-actions { display: flex; gap: 8px; }
 @media (max-width: 860px) { .admin-tabs { margin-left: 8px; } .admin-header { flex-wrap: wrap; } }
+
+/* Five tabs no longer fit beside the brand on a phone: give them their own scrollable row. */
+@media (max-width: 860px) {
+  .admin-header { flex-wrap: wrap; }
+  .admin-tabs { order: 3; flex: 1 1 100%; margin: 0 calc(var(--pad-x) * -1); padding: 0 var(--pad-x); overflow-x: auto; border-top: 1px solid rgba(243, 240, 233, .12); }
+  .admin-tab { flex: none; }
+  .admin-header-actions { flex-wrap: wrap; justify-content: flex-end; }
+}

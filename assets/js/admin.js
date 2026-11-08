@@ -60,8 +60,10 @@
     $('#login-screen').hidden = false;
   }
 
+  let lastLoginStatus = 0;
   async function tryToken(candidate) {
     const res = await fetch(API + '/projects', { headers: { 'x-admin-token': candidate } });
+    lastLoginStatus = res.status;
     if (!res.ok) return false;
     token = candidate;
     sessionStorage.setItem(TOKEN_KEY, candidate);
@@ -74,13 +76,35 @@
     const err = $('#login-error');
     err.hidden = true;
     const ok = await tryToken(input.value.trim());
-    if (!ok) { err.hidden = false; return; }
+    if (!ok) {
+      err.textContent = lastLoginStatus === 429 ? 'Too many failed attempts. Try again in 15 minutes.' : 'Invalid token. Try again.';
+      err.hidden = false;
+      return;
+    }
     $('#login-screen').hidden = true;
     $('#app').hidden = false;
     boot();
   });
 
   $('#logout-btn').addEventListener('click', signOut);
+
+  // Downscale and re-encode big photos in the browser before upload, so a
+  // 10 MB camera original never reaches the site. Panoramas keep more pixels.
+  async function shrinkImage(file, maxEdge) {
+    if (!/^image\/(jpeg|png|webp)$/.test(file.type)) return file;
+    try {
+      const bmp = await createImageBitmap(file);
+      const scale = Math.min(1, maxEdge / Math.max(bmp.width, bmp.height));
+      if (scale === 1 && file.size < 1.2 * 1024 * 1024) return file;
+      const canvas = document.createElement('canvas');
+      canvas.width = Math.round(bmp.width * scale);
+      canvas.height = Math.round(bmp.height * scale);
+      canvas.getContext('2d').drawImage(bmp, 0, 0, canvas.width, canvas.height);
+      const blob = await new Promise((r) => canvas.toBlob(r, 'image/webp', 0.86));
+      if (!blob || blob.type !== 'image/webp' || blob.size >= file.size) return file;
+      return new File([blob], file.name.replace(/\.[^.]+$/, '') + '.webp', { type: 'image/webp' });
+    } catch { return file; }
+  }
 
   // -------------------------------------------------------------- image field --
   function imageField(container, key, value, onChange, labelText) {
@@ -114,9 +138,10 @@
     $('[data-pick]', wrap).addEventListener('click', () => fileInput.click());
     $('[data-clear]', wrap).addEventListener('click', () => setValue(''));
     fileInput.addEventListener('change', async () => {
-      const file = fileInput.files[0];
+      let file = fileInput.files[0];
       if (!file) return;
       status.textContent = 'Uploading…';
+      file = await shrinkImage(file, /src$/.test(key) ? 4096 : 2400);
       try {
         const form = new FormData();
         form.append('file', file);
@@ -604,19 +629,243 @@
     renderPortfolio();
   });
 
+  // ----------------------------------------------------------------- articles --
+  let arItems = [];
+  const CATS = [['Developer', 'Developer marketing'], ['Visualization', 'Visualization'], ['Immersive', 'Immersive tech'], ['Market', 'Market notes']];
+
+  function arCard(item) {
+    const card = document.createElement('details');
+    card.className = 'enq-card pf-card';
+    card.dataset.folder = 'articles';
+    if (!item.id) card.open = true;
+    const status = () => (item.published ? 'PUBLISHED' : 'DRAFT') + (item.featured ? ' · FEATURED' : '');
+    card.innerHTML =
+      '<summary style="cursor:pointer;display:flex;gap:12px;align-items:baseline;flex-wrap:wrap"><span class="enq-name" data-sum-title></span><span class="enq-meta" data-sum-status></span></summary>' +
+      '<div class="grid-2" style="margin-top:14px">' +
+      '<label class="field"><span>Title *</span><input type="text" data-f="title" value="' + escAttr(item.title || '') + '"></label>' +
+      '<label class="field"><span>Slug * (URL)</span><input type="text" data-f="slug" value="' + escAttr(item.slug || '') + '" placeholder="my-article-title" pattern="[a-z0-9]+(-[a-z0-9]+)*"></label>' +
+      '<label class="field"><span>Category</span><select data-f="category">' + CATS.map((c) => '<option value="' + c[0] + '"' + (item.category === c[0] ? ' selected' : '') + '>' + c[1] + '</option>').join('') + '</select></label>' +
+      '<label class="field"><span>Publish date</span><input type="date" data-f="published_at" value="' + escAttr(item.published_at || '') + '"></label>' +
+      '<label class="field"><span>Author</span><input type="text" data-f="author" value="' + escAttr(item.author || 'Ananta Property Editorial') + '"></label>' +
+      '<label class="field"><span>Author role</span><input type="text" data-f="author_role" value="' + escAttr(item.author_role || '') + '" placeholder="SALES ENABLEMENT TEAM"></label>' +
+      '<label class="field"><span>Read time (minutes, blank = automatic)</span><input type="number" min="1" data-f="read_minutes" value="' + escAttr(item.read_minutes || '') + '"></label>' +
+      '<label class="field"><span>Tags (comma separated)</span><input type="text" data-f="tags" value="' + escAttr((item.tags || []).join(', ')) + '" placeholder="SALES GALLERY, LEAD CAPTURE"></label>' +
+      '</div>' +
+      '<label class="field"><span>Summary (shown in lists and search results)</span><textarea data-f="excerpt" rows="2">' + escHtml(item.excerpt || '') + '</textarea></label>' +
+      '<label class="field"><span>Body</span><textarea data-f="body" rows="16" style="font-family:ui-monospace,Consolas,monospace;font-size:12px;line-height:1.6">' + escHtml(item.body || '') + '</textarea></label>' +
+      '<div class="grid-2"><div data-hero></div><div data-thumb></div></div>' +
+      '<label class="field"><span>Hero image description (alt text)</span><input type="text" data-f="hero_alt" value="' + escAttr(item.hero_alt || '') + '"></label>' +
+      '<div class="enq-actions" style="flex-wrap:wrap">' +
+      '<label class="check-inline"><input type="checkbox" data-f="published"' + (item.published ? ' checked' : '') + '> Published</label>' +
+      '<label class="check-inline"><input type="checkbox" data-f="featured"' + (item.featured ? ' checked' : '') + '> Featured</label>' +
+      '<button type="button" class="btn btn-gold btn-sm" data-save>SAVE</button>' +
+      '<a class="btn-line btn-sm" data-view-link target="_blank" rel="noopener" hidden>VIEW LIVE ↗</a>' +
+      '<button type="button" class="btn-line btn-sm danger" data-del>DELETE</button>' +
+      '<span class="hint" data-msg style="margin:0"></span></div>';
+
+    const f = (k) => $('[data-f="' + k + '"]', card);
+    const msg = $('[data-msg]', card);
+    let hero = item.hero_image || '';
+    let thumb = item.thumb_image || '';
+    imageField($('[data-hero]', card), 'article_hero', hero, (v) => { hero = v; }, 'Hero image (top of the article)');
+    imageField($('[data-thumb]', card), 'article_thumb', thumb, (v) => { thumb = v; }, 'List thumbnail (blank = hero)');
+
+    const refresh = () => {
+      $('[data-sum-title]', card).textContent = item.title || 'New article';
+      $('[data-sum-status]', card).textContent = status();
+      const link = $('[data-view-link]', card);
+      link.hidden = !(item.id && item.published && item.slug);
+      if (!link.hidden) link.href = 'article.html?slug=' + encodeURIComponent(item.slug);
+    };
+    refresh();
+
+    $('[data-save]', card).addEventListener('click', async () => {
+      const body = {
+        title: f('title').value.trim(), slug: f('slug').value.trim(), category: f('category').value,
+        author: f('author').value.trim(), author_role: f('author_role').value.trim(),
+        read_minutes: Number(f('read_minutes').value || 0) || null,
+        tags: f('tags').value.split(',').map((t) => t.trim()).filter(Boolean),
+        excerpt: f('excerpt').value.trim(), body: f('body').value, hero_image: hero, thumb_image: thumb,
+        hero_alt: f('hero_alt').value.trim(), published: f('published').checked, featured: f('featured').checked,
+      };
+      if (f('published_at').value) body.published_at = f('published_at').value;
+      if (!body.title || !body.slug) { msg.textContent = 'Title and slug are required.'; return; }
+      if (!/^[a-z0-9]+(-[a-z0-9]+)*$/.test(body.slug)) { msg.textContent = 'Slug: lowercase letters, numbers and hyphens only.'; return; }
+      msg.textContent = 'Saving…';
+      try {
+        const res = item.id
+          ? await apiFetch('/articles?id=' + encodeURIComponent(item.id), { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })
+          : await apiFetch('/articles', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+        Object.assign(item, res.item);
+        if (item.featured) arItems.forEach((o) => { if (o !== item) o.featured = false; });
+        msg.textContent = 'Saved.';
+        refresh();
+      } catch (err) { msg.textContent = 'Error: ' + err.message; }
+    });
+    $('[data-del]', card).addEventListener('click', async () => {
+      if (item.id) {
+        if (!confirm('Delete this article permanently?')) return;
+        try { await apiFetch('/articles?id=' + encodeURIComponent(item.id), { method: 'DELETE' }); }
+        catch (err) { msg.textContent = 'Error: ' + err.message; return; }
+        arItems = arItems.filter((x) => x.id !== item.id);
+      } else {
+        arItems = arItems.filter((x) => x !== item);
+      }
+      renderArticles();
+    });
+    return card;
+  }
+
+  function renderArticles() {
+    const host = $('#ar-list');
+    host.innerHTML = '';
+    if (!arItems.length) host.innerHTML = '<p class="hint" style="margin:0">No articles yet.</p>';
+    arItems.forEach((it) => host.appendChild(arCard(it)));
+  }
+
+  async function loadArticles() {
+    $('#ar-status').textContent = 'Loading…';
+    try {
+      arItems = (await apiFetch('/articles')).items || [];
+      $('#ar-status').textContent = '';
+      renderArticles();
+    } catch (err) { $('#ar-status').textContent = 'Error: ' + err.message; }
+  }
+
+  $('#ar-add').addEventListener('click', () => {
+    arItems.unshift({ title: '', slug: '', category: 'Developer', excerpt: '', body: '', hero_image: '', hero_alt: '', thumb_image: '', author: 'Ananta Property Editorial', author_role: '', published_at: new Date().toISOString().slice(0, 10), tags: [], featured: false, published: false });
+    renderArticles();
+  });
+
+  // -------------------------------------------------------------- social proof --
+  let spItems = [];
+  const SP = {
+    testimonial: { title: 'Name', subtitle: 'Role · company', body: 'Quote', image: 'Photo (optional)' },
+    client: { title: 'Client name', image: 'Logo' },
+    stat: { value: 'Number (e.g. 120+)', title: 'Label', subtitle: 'Small note (optional)' },
+  };
+
+  function spCard(item) {
+    const L = SP[item.kind];
+    const card = document.createElement('article');
+    card.className = 'enq-card pf-card';
+    card.dataset.folder = 'social-proof';
+    let html = '<div class="grid-2">';
+    if (L.value) html += '<label class="field"><span>' + L.value + '</span><input type="text" data-f="value" value="' + escAttr(item.value || '') + '"></label>';
+    html += '<label class="field"><span>' + L.title + ' *</span><input type="text" data-f="title" value="' + escAttr(item.title || '') + '"></label>';
+    if (L.subtitle) html += '<label class="field"><span>' + L.subtitle + '</span><input type="text" data-f="subtitle" value="' + escAttr(item.subtitle || '') + '"></label>';
+    html += '<label class="field"><span>Sort order</span><input type="number" data-f="sort_order" value="' + escAttr(item.sort_order ?? 0) + '"></label></div>';
+    if (L.body) html += '<label class="field"><span>' + L.body + '</span><textarea data-f="body" rows="3">' + escHtml(item.body || '') + '</textarea></label>';
+    if (L.image) html += '<div data-img></div>';
+    html += '<div class="enq-actions"><label class="check-inline"><input type="checkbox" data-f="published"' + (item.published ? ' checked' : '') + '> Published</label>' +
+      '<button type="button" class="btn btn-gold btn-sm" data-save>SAVE</button>' +
+      '<button type="button" class="btn-line btn-sm danger" data-del>DELETE</button><span class="hint" data-msg style="margin:0"></span></div>';
+    card.innerHTML = html;
+
+    let img = item.image_url || '';
+    if (L.image) imageField($('[data-img]', card), 'sp_image', img, (v) => { img = v; }, L.image);
+    const f = (k) => { const el = $('[data-f="' + k + '"]', card); return el ? el.value : ''; };
+    const msg = $('[data-msg]', card);
+
+    $('[data-save]', card).addEventListener('click', async () => {
+      const body = {
+        kind: item.kind, title: f('title').trim(), subtitle: f('subtitle').trim(), body: f('body').trim(), value: f('value').trim(),
+        image_url: img, sort_order: Number(f('sort_order') || 0), published: $('[data-f="published"]', card).checked,
+      };
+      if (!body.title) { msg.textContent = (L.title) + ' is required.'; return; }
+      msg.textContent = 'Saving…';
+      try {
+        const res = item.id
+          ? await apiFetch('/social-proof?id=' + encodeURIComponent(item.id), { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })
+          : await apiFetch('/social-proof', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+        Object.assign(item, res.item);
+        msg.textContent = 'Saved.';
+      } catch (err) { msg.textContent = 'Error: ' + err.message; }
+    });
+    $('[data-del]', card).addEventListener('click', async () => {
+      if (item.id) {
+        if (!confirm('Delete this item?')) return;
+        try { await apiFetch('/social-proof?id=' + encodeURIComponent(item.id), { method: 'DELETE' }); }
+        catch (err) { msg.textContent = 'Error: ' + err.message; return; }
+        spItems = spItems.filter((x) => x.id !== item.id);
+      } else {
+        spItems = spItems.filter((x) => x !== item);
+      }
+      renderProof();
+    });
+    return card;
+  }
+
+  function renderProof() {
+    const kind = $('#sp-kind').value;
+    const host = $('#sp-list');
+    host.innerHTML = '';
+    const list = spItems.filter((x) => x.kind === kind);
+    if (!list.length) host.innerHTML = '<p class="hint" style="margin:0">Nothing added for this type yet.</p>';
+    list.forEach((it) => host.appendChild(spCard(it)));
+  }
+
+  async function loadProof() {
+    $('#sp-status').textContent = 'Loading…';
+    try {
+      spItems = (await apiFetch('/social-proof')).items || [];
+      $('#sp-status').textContent = '';
+      renderProof();
+    } catch (err) { $('#sp-status').textContent = 'Error: ' + err.message; }
+  }
+
+  $('#sp-kind').addEventListener('change', renderProof);
+  $('#sp-add').addEventListener('click', () => {
+    const kind = $('#sp-kind').value;
+    spItems.push({ kind, title: '', subtitle: '', body: '', value: '', image_url: '', sort_order: spItems.filter((x) => x.kind === kind).length + 1, published: true });
+    renderProof();
+  });
+
+  // ------------------------------------------------------------------- backup --
+  $('#export-btn').addEventListener('click', async () => {
+    const btn = $('#export-btn');
+    const label = btn.textContent;
+    btn.textContent = 'EXPORTING…';
+    btn.disabled = true;
+    try {
+      const [pr, pf, ar, sp, en] = await Promise.all(['/projects', '/portfolio', '/articles', '/social-proof', '/enquiries'].map((p) => apiFetch(p)));
+      const dump = {
+        exported_at: new Date().toISOString(),
+        projects: pr.projects, portfolio_items: pf.items, articles: ar.items, social_proof_items: sp.items, enquiries: en.enquiries,
+      };
+      const blob = new Blob([JSON.stringify(dump, null, 2)], { type: 'application/json' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'ananta-backup-' + new Date().toISOString().slice(0, 10) + '.json';
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+    } catch (err) {
+      alert('Backup failed: ' + err.message);
+    } finally {
+      btn.textContent = label;
+      btn.disabled = false;
+    }
+  });
+
+  // --------------------------------------------------------------------- views --
+  const VIEWS = {
+    enquiries: ['#enquiries-view', () => loadEnquiries()],
+    portfolio: ['#portfolio-view', () => loadPortfolio()],
+    articles: ['#articles-view', () => loadArticles()],
+    proof: ['#proof-view', () => loadProof()],
+  };
+
   function showView(view) {
-    const isEnq = view === 'enquiries';
-    const isPf = view === 'portfolio';
-    $('.admin-shell').classList.toggle('is-enquiries', isEnq || isPf);
-    $('#enquiries-view').hidden = !isEnq;
-    $('#portfolio-view').hidden = !isPf;
-    if (isPf) loadPortfolio();
+    $('.admin-shell').classList.toggle('is-enquiries', view !== 'projects');
+    Object.keys(VIEWS).forEach((k) => { $(VIEWS[k][0]).hidden = k !== view; });
     $$('.admin-tab').forEach((t) => {
       const on = t.dataset.view === view;
       t.classList.toggle('is-active', on);
       t.setAttribute('aria-selected', String(on));
     });
-    if (isEnq) loadEnquiries();
+    if (VIEWS[view]) VIEWS[view][1]();
   }
 
   $$('.admin-tab').forEach((t) => t.addEventListener('click', () => showView(t.dataset.view)));

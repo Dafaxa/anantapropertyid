@@ -165,12 +165,14 @@
   // ── Insights: category filter ─────────────────────────────────────────
   const insights = $('[data-insights]');
   if (insights) {
-    const items = $$('.ins-item', insights);
-    const featured = $('[data-featured]');
-    const count = $('[data-count]');
-    const label = $('[data-filter-label]');
-    const empty = $('[data-empty]');
+    // Queried on every click (not once up front): insights-render.js swaps in
+    // the CMS articles after this script has run.
     onChoice('topic', (btn) => {
+      const items = $$('.ins-item', insights);
+      const featured = $('[data-featured]');
+      const count = $('[data-count]');
+      const label = $('[data-filter-label]');
+      const empty = $('[data-empty]');
       const topic = btn.dataset.choice;
       const all = topic === 'All';
       const matching = items.filter((it) => all || it.dataset.cat === topic);

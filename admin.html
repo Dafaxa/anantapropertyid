@@ -38,9 +38,12 @@
     <div class="admin-tabs" role="tablist">
       <button type="button" class="admin-tab is-active" data-view="projects" role="tab" aria-selected="true">PROJECTS</button>
       <button type="button" class="admin-tab" data-view="portfolio" role="tab" aria-selected="false">PACKAGE PORTFOLIO</button>
+      <button type="button" class="admin-tab" data-view="articles" role="tab" aria-selected="false">ARTICLES</button>
+      <button type="button" class="admin-tab" data-view="proof" role="tab" aria-selected="false">SOCIAL PROOF</button>
       <button type="button" class="admin-tab" data-view="enquiries" role="tab" aria-selected="false">ENQUIRIES <span class="tab-badge" id="enq-badge" hidden>0</span></button>
     </div>
     <div class="admin-header-actions">
+      <button type="button" class="btn-line" id="export-btn" title="Download all content and enquiries as a JSON file">BACKUP</button>
       <a class="btn-line" href="index.html" target="_blank" rel="noopener">VIEW SITE ↗</a>
       <button type="button" class="btn-line" id="logout-btn">LOG OUT</button>
     </div>
@@ -226,6 +229,35 @@
       <p class="hint" style="padding:0 18px;margin:8px 0">Work shown in the "Selected work" section of that package's page. Separate from the Projects list. A package with no published work hides the section.</p>
       <p id="pf-status" class="save-status" aria-live="polite"></p>
       <div id="pf-list" class="enq-list"></div>
+    </section>
+
+    <section id="articles-view" class="enq-view" hidden aria-label="Insights articles">
+      <div class="enq-toolbar">
+        <p class="form-title">Insights articles</p>
+        <div class="form-topbar-actions"><button type="button" class="btn btn-gold btn-sm" id="ar-add">+ NEW ARTICLE</button></div>
+      </div>
+      <p class="hint" style="padding:0 18px;margin:8px 0">Body format: a blank line between paragraphs &middot; <code>## Heading</code> &middot; <code>&gt; Quote</code> &middot; <code>- List item</code> &middot; <code>[box] Title</code> then <code>- items</code> (numbered box) &middot; <code>![caption](image-url)</code> &middot; <code>**bold**</code> &middot; <code>[text](https://link)</code>. Only published articles appear on the site; the Featured one is shown large at the top of Insights. Once at least one article is published, the Insights page shows only CMS articles.</p>
+      <p id="ar-status" class="save-status" aria-live="polite"></p>
+      <div id="ar-list" class="enq-list"></div>
+    </section>
+
+    <section id="proof-view" class="enq-view" hidden aria-label="Social proof">
+      <div class="enq-toolbar">
+        <p class="form-title">Social proof</p>
+        <div class="form-topbar-actions">
+          <label class="check-inline">Type
+            <select id="sp-kind">
+              <option value="testimonial">Testimonials</option>
+              <option value="client">Client logos</option>
+              <option value="stat">Headline numbers</option>
+            </select>
+          </label>
+          <button type="button" class="btn btn-gold btn-sm" id="sp-add">+ ADD</button>
+        </div>
+      </div>
+      <p class="hint" style="padding:0 18px;margin:8px 0">Shown on the homepage between Packages and the closing band. Add only real quotes, clients and numbers you can stand behind. Nothing published means the section stays hidden.</p>
+      <p id="sp-status" class="save-status" aria-live="polite"></p>
+      <div id="sp-list" class="enq-list"></div>
     </section>
 
     <section id="enquiries-view" class="enq-view" hidden aria-label="Enquiries">
